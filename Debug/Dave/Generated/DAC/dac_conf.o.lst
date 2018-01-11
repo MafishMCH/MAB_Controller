@@ -1,0 +1,96 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "dac_conf.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .global IQ_zmierzone_Channel_Config
+  20              	 .section .bss.IQ_zmierzone_Channel_Config,"aw",%nobits
+  21              	 .align 2
+  24              	IQ_zmierzone_Channel_Config:
+  25 0000 00000000 	 .space 8
+  25      00000000 
+  26              	 .global IQ_zmierzone
+  27              	 .section .data.IQ_zmierzone,"aw",%progbits
+  28              	 .align 2
+  31              	IQ_zmierzone:
+  32 0000 00800148 	 .word 1208057856
+  33 0004 00000000 	 .word IQ_zmierzone_Channel_Config
+  34 0008 00001000 	 .word 1048576
+  35 000c 00000000 	 .word 0
+  36 0010 00       	 .byte 0
+  37 0011 000000   	 .space 3
+  38 0014 00000000 	 .word 0
+  39 0018 0000     	 .short 0
+  40 001a 0000     	 .short 0
+  41 001c 0000     	 .short 0
+  42 001e 0000     	 .short 0
+  43 0020 00       	 .byte 0
+  44 0021 00       	 .byte 0
+  45 0022 00       	 .byte 0
+  46 0023 00       	 .space 1
+  47 0024 00000000 	 .word 0
+  48 0028 01       	 .byte 1
+  49 0029 000000   	 .space 3
+  50              	 .global IQ_zadane_Channel_Config
+  51              	 .section .bss.IQ_zadane_Channel_Config,"aw",%nobits
+  52              	 .align 2
+  55              	IQ_zadane_Channel_Config:
+  56 0000 00000000 	 .space 8
+  56      00000000 
+  57              	 .global IQ_zadane
+  58              	 .section .data.IQ_zadane,"aw",%progbits
+  59              	 .align 2
+  62              	IQ_zadane:
+  63 0000 00800148 	 .word 1208057856
+  64 0004 00000000 	 .word IQ_zadane_Channel_Config
+  65 0008 00001000 	 .word 1048576
+  66 000c 00000000 	 .word 0
+  67 0010 00       	 .byte 0
+  68 0011 000000   	 .space 3
+  69 0014 00000000 	 .word 0
+  70 0018 0000     	 .short 0
+  71 001a 0000     	 .short 0
+  72 001c 0000     	 .short 0
+  73 001e 0000     	 .short 0
+  74 0020 00       	 .byte 0
+  75 0021 00       	 .byte 0
+  76 0022 01       	 .byte 1
+  77 0023 00       	 .space 1
+  78 0024 00000000 	 .word 0
+  79 0028 01       	 .byte 1
+  80 0029 000000   	 .space 3
+  81              	 .text
+  82              	.Letext0:
+  83              	 .file 1 "c:\\davev4-64bit\\dave-4.3.2\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+  84              	 .file 2 "c:\\davev4-64bit\\dave-4.3.2\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+  85              	 .file 3 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/CMSIS/Infineon/XMC4500_series/Include/XMC4500.h"
+  86              	 .file 4 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/XMCLib/inc/xmc_dac.h"
+  87              	 .file 5 "../Dave/Generated/DAC/dac.h"
+  88              	 .file 6 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/CMSIS/Include/core_cm4.h"
+  89              	 .file 7 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/CMSIS/Infineon/XMC4500_series/Include/system_XMC4500.h"
+  90              	 .file 8 "../Dave/Generated/DAC/dac_conf.c"
+DEFINED SYMBOLS
+                            *ABS*:00000000 dac_conf.c
+    {standard input}:24     .bss.IQ_zmierzone_Channel_Config:00000000 IQ_zmierzone_Channel_Config
+    {standard input}:21     .bss.IQ_zmierzone_Channel_Config:00000000 $d
+    {standard input}:31     .data.IQ_zmierzone:00000000 IQ_zmierzone
+    {standard input}:28     .data.IQ_zmierzone:00000000 $d
+    {standard input}:55     .bss.IQ_zadane_Channel_Config:00000000 IQ_zadane_Channel_Config
+    {standard input}:52     .bss.IQ_zadane_Channel_Config:00000000 $d
+    {standard input}:62     .data.IQ_zadane:00000000 IQ_zadane
+    {standard input}:59     .data.IQ_zadane:00000000 $d
+
+NO UNDEFINED SYMBOLS
