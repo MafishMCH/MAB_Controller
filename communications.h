@@ -5,16 +5,16 @@
  *      Author: Mafish
  */
 
-int XMC_Init();
-void XMC_Check();
-void eorx();
-void Message_interpreter();
-void Send(uint8_t);
-void Send_Leg(struct Leg *n);
+uint8_t  XMC_Init(uint8_t);			//initialize driver (n). n=10 for all drivers
+void XMC_Check();						//check state all drivers
+void eorx();									//end of receive interrupt
+void Message_interpreter();		//read last message
+void Send(uint8_t);						// Send (n) bytes of data via half-duplex uart
+void Send_Leg(struct Leg *n);	//Send regular command string to both of legs drivers
 
-uint8_t  XMC_Init(uint8_t n)
+uint8_t  XMC_Init(uint8_t n)	//initialize driver (n). n=10 for all drivers
 {
-	if(n == 10)
+	if(n == 10)							//if n = 10 then init all drivers
 		for(uint8_t i = 0; i < 8; i++)
 		{
 			txData[1] = 0x10 + i;
@@ -23,7 +23,7 @@ uint8_t  XMC_Init(uint8_t n)
 			Send(4);
 			delay(300);
 		}
-	else
+	else										//init single driver (n)
 		txData[1] = 0x10 + n;
 		txData[2] = 0xA1;
 		txData[3] = EOF;
@@ -32,9 +32,9 @@ uint8_t  XMC_Init(uint8_t n)
 
 	return 0;
 }
-void XMC_Check()
+void XMC_Check()	//check state all drivers
 {
-	for(uint8_t i = 0; i < 8; i++)
+	for(uint8_t i = 0; i < 8; i++)		//iterate to check state of all drivers
 	{
 		DIGITAL_IO_SetOutputHigh(&LED1);
 		txData[1] = 0x10 + i;
@@ -45,7 +45,7 @@ void XMC_Check()
 		DIGITAL_IO_SetOutputLow((&LED1));
 	}
 }
-void eorx()
+void eorx()		//end of receive interrupt
 {
 	if(rxByte == SOF)
 	{
@@ -69,7 +69,7 @@ void eotx()
 {
 
 }
-void Message_interpreter()
+void Message_interpreter()		//read last message
 {
 
 	if(rxData[0] == SOF && rxData[1] == adress)
@@ -77,21 +77,21 @@ void Message_interpreter()
 		uint8_t numer_silnika;
 		numer_silnika = rxData[2] - 0x10;
 		if(rxData[3] == INIT)
-			stanowisko.silnik_start[numer_silnika] = rxData[4];
+			stanowisko.motor_go[numer_silnika] = rxData[4];
 		else if(rxData[3] == CHECK)
 		{
-			stanowisko.silnik_start[numer_silnika] = rxData[4];
-			stanowisko.silnik_numer[numer_silnika] = rxData[5];
+			stanowisko.motor_go[numer_silnika] = rxData[4];
+			stanowisko.motor_n[numer_silnika] = rxData[5];
 		}
 		else
 		{
 			stanowisko.i_net[numer_silnika] =rxData[3] << 8 | rxData[4];
-			stanowisko.kat_abs[numer_silnika] = rxData[5] << 24 | rxData[6] << 16 | rxData[7] << 8 | rxData[8];
+			stanowisko.ang_abs[numer_silnika] = rxData[5] << 24 | rxData[6] << 16 | rxData[7] << 8 | rxData[8];
 		}
 	}
 
 }
-void Send_Leg(struct Leg *n)
+void Send_Leg(struct Leg *n)	//Send regular command string to both of legs drivers
 {
 	  txData[1] = n->adresy[0];
 	  txData[2] = n->poz_zad[0] >> 8;
@@ -105,7 +105,7 @@ void Send_Leg(struct Leg *n)
 	  Send(5);
 	  delay(500);
 }
-void Send(uint8_t size )
+void Send(uint8_t size )	// Send (n) bytes of data via half-duplex uart
 {
 	UART_Transmit(&RS, txData, size);
 	while(UART_IsTxBusy(&RS));

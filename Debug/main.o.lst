@@ -3176,15 +3176,19 @@
  406              	 .section .bss.init,"aw",%nobits
  409              	init:
  410 0000 00       	 .space 1
- 411              	 .comm stanowisko,92,4
- 412              	 .section .text.delay,"ax",%progbits
- 413              	 .align 2
- 414              	 .global delay
- 415              	 .thumb
- 416              	 .thumb_func
- 418              	delay:
- 419              	.LFB322:
- 420              	 .file 4 "../variables.h"
+ 411              	 .global motors_go
+ 412              	 .section .bss.motors_go,"aw",%nobits
+ 415              	motors_go:
+ 416 0000 00       	 .space 1
+ 417              	 .comm stanowisko,76,4
+ 418              	 .section .text.delay,"ax",%progbits
+ 419              	 .align 2
+ 420              	 .global delay
+ 421              	 .thumb
+ 422              	 .thumb_func
+ 424              	delay:
+ 425              	.LFB322:
+ 426              	 .file 4 "../variables.h"
    1:../variables.h **** #define SOF 0xCC
    2:../variables.h **** #define EOF 0xDD
    3:../variables.h **** #define INIT 0xA1
@@ -3193,342 +3197,325 @@
    6:../variables.h **** 
    7:../variables.h **** // kinematics vars
    8:../variables.h **** float pi = 3.14159f;
-   9:../variables.h **** float l1 =100;
-  10:../variables.h **** float l2 =200;
-  11:../variables.h **** float d =89;
-  12:../variables.h **** float t = 0.0f;
-  13:../variables.h **** float dt = 0.02;
+   9:../variables.h **** float l1 =100;					//length of thight
+  10:../variables.h **** float l2 =200;					//length of tibia
+  11:../variables.h **** float d =89;					//distance between motors
+  12:../variables.h **** float t = 0.0f;					//time of execution
+  13:../variables.h **** float dt = 0.02;				//delta t
   14:../variables.h **** 
   15:../variables.h **** //communication vars
-  16:../variables.h **** uint8_t rxData[10];
-  17:../variables.h **** uint8_t txData[10];
-  18:../variables.h **** uint8_t adress =0xEE;
-  19:../variables.h **** uint8_t rxByte = 0;
-  20:../variables.h **** uint8_t iterator_wiadomosci = 0;
+  16:../variables.h **** uint8_t rxData[10];								//buffer for incoming messages
+  17:../variables.h **** uint8_t txData[10];								//buffer for outgoing messages
+  18:../variables.h **** uint8_t adress =0xEE;						//adress of Controller device
+  19:../variables.h **** uint8_t rxByte = 0;								//temprorary incoming byte holder
+  20:../variables.h **** uint8_t iterator_wiadomosci = 0;	//message iterator
   21:../variables.h **** 
   22:../variables.h **** //other vars
-  23:../variables.h **** uint8_t is_delay = 1;
-  24:../variables.h **** uint8_t init = 0;
-  25:../variables.h **** 
-  26:../variables.h **** struct vec2
-  27:../variables.h **** {
-  28:../variables.h **** 	float x;
-  29:../variables.h **** 	float y;
-  30:../variables.h **** };
-  31:../variables.h **** struct vec3
-  32:../variables.h **** {
-  33:../variables.h **** 	float x;
-  34:../variables.h **** 	float y;
-  35:../variables.h **** 	float z;
-  36:../variables.h **** };
-  37:../variables.h **** struct Leg
-  38:../variables.h **** {
-  39:../variables.h **** 	uint8_t silnik_numer[2];
-  40:../variables.h **** 	uint8_t silnik_start[2];
-  41:../variables.h **** 	uint8_t adresy[2];
-  42:../variables.h **** 	int16_t i_net[2];
-  43:../variables.h **** 	int32_t kat_abs[2];
-  44:../variables.h **** 	float kat_abs_poprzedni[2];
-  45:../variables.h **** 	float predkosc_silnika[2];
-  46:../variables.h **** 	int16_t ks;
-  47:../variables.h **** 	int16_t kd;
-  48:../variables.h **** 	int16_t dzielnik;
-  49:../variables.h **** 	int16_t Iq_zadane[2];
-  50:../variables.h **** 	int32_t teta_int[2];
-  51:../variables.h **** 	int16_t poz_zad[2];
-  52:../variables.h **** 	struct vec2 stopa;
-  53:../variables.h **** 	float teta[2];
-  54:../variables.h **** 	float r;
-  55:../variables.h **** 	float r_poprzednie;
-  56:../variables.h **** 	float kat_abs_rad[2];
-  57:../variables.h **** };
-  58:../variables.h **** struct Leg stanowisko;
-  59:../variables.h **** 
-  60:../variables.h **** 
-  61:../variables.h **** void delay(uint32_t us)
-  62:../variables.h **** {
- 421              	 .loc 4 62 0
- 422              	 .cfi_startproc
- 423              	 
- 424              	 
- 425 0000 80B5     	 push {r7,lr}
- 426              	.LCFI39:
- 427              	 .cfi_def_cfa_offset 8
- 428              	 .cfi_offset 7,-8
- 429              	 .cfi_offset 14,-4
- 430 0002 82B0     	 sub sp,sp,#8
- 431              	.LCFI40:
- 432              	 .cfi_def_cfa_offset 16
- 433 0004 00AF     	 add r7,sp,#0
- 434              	.LCFI41:
- 435              	 .cfi_def_cfa_register 7
- 436 0006 7860     	 str r0,[r7,#4]
-  63:../variables.h **** 	us *= 100;
- 437              	 .loc 4 63 0
- 438 0008 7B68     	 ldr r3,[r7,#4]
- 439 000a 6422     	 movs r2,#100
- 440 000c 02FB03F3 	 mul r3,r2,r3
- 441 0010 7B60     	 str r3,[r7,#4]
-  64:../variables.h **** 	is_delay = 1;
- 442              	 .loc 4 64 0
- 443 0012 0A4B     	 ldr r3,.L11
- 444 0014 0122     	 movs r2,#1
- 445 0016 1A70     	 strb r2,[r3]
-  65:../variables.h **** 	TIMER_SetTimeInterval(&DELAY, us);
- 446              	 .loc 4 65 0
- 447 0018 0948     	 ldr r0,.L11+4
- 448 001a 7968     	 ldr r1,[r7,#4]
- 449 001c FFF7FEFF 	 bl TIMER_SetTimeInterval
-  66:../variables.h **** 	TIMER_Start(&DELAY);
- 450              	 .loc 4 66 0
- 451 0020 0748     	 ldr r0,.L11+4
- 452 0022 FFF7FEFF 	 bl TIMER_Start
-  67:../variables.h **** 	while(is_delay);
- 453              	 .loc 4 67 0
- 454 0026 00BF     	 nop
- 455              	.L10:
- 456              	 .loc 4 67 0 is_stmt 0 discriminator 1
- 457 0028 044B     	 ldr r3,.L11
- 458 002a 1B78     	 ldrb r3,[r3]
- 459 002c 002B     	 cmp r3,#0
- 460 002e FBD1     	 bne .L10
-  68:../variables.h **** 	TIMER_Stop(&DELAY);
- 461              	 .loc 4 68 0 is_stmt 1
- 462 0030 0348     	 ldr r0,.L11+4
- 463 0032 FFF7FEFF 	 bl TIMER_Stop
-  69:../variables.h **** }
- 464              	 .loc 4 69 0
- 465 0036 0837     	 adds r7,r7,#8
- 466              	.LCFI42:
- 467              	 .cfi_def_cfa_offset 8
- 468 0038 BD46     	 mov sp,r7
- 469              	.LCFI43:
- 470              	 .cfi_def_cfa_register 13
- 471              	 
- 472 003a 80BD     	 pop {r7,pc}
- 473              	.L12:
- 474              	 .align 2
- 475              	.L11:
- 476 003c 00000000 	 .word is_delay
- 477 0040 00000000 	 .word DELAY
- 478              	 .cfi_endproc
- 479              	.LFE322:
- 481              	 .section .text.Init,"ax",%progbits
- 482              	 .align 2
- 483              	 .global Init
- 484              	 .thumb
- 485              	 .thumb_func
- 487              	Init:
- 488              	.LFB323:
-  70:../variables.h **** 
-  71:../variables.h **** void Init()
-  72:../variables.h **** {
- 489              	 .loc 4 72 0
- 490              	 .cfi_startproc
- 491              	 
- 492              	 
- 493              	 
- 494 0000 80B4     	 push {r7}
- 495              	.LCFI44:
- 496              	 .cfi_def_cfa_offset 4
- 497              	 .cfi_offset 7,-4
- 498 0002 83B0     	 sub sp,sp,#12
- 499              	.LCFI45:
- 500              	 .cfi_def_cfa_offset 16
- 501 0004 00AF     	 add r7,sp,#0
- 502              	.LCFI46:
- 503              	 .cfi_def_cfa_register 7
-  73:../variables.h **** 	txData[0] = SOF;
- 504              	 .loc 4 73 0
- 505 0006 2A4B     	 ldr r3,.L16
- 506 0008 CC22     	 movs r2,#204
- 507 000a 1A70     	 strb r2,[r3]
-  74:../variables.h **** 	stanowisko.adresy[0] = 0x10;
- 508              	 .loc 4 74 0
- 509 000c 294B     	 ldr r3,.L16+4
- 510 000e 1022     	 movs r2,#16
- 511 0010 1A71     	 strb r2,[r3,#4]
-  75:../variables.h **** 	stanowisko.adresy[1] = 0x11;
- 512              	 .loc 4 75 0
- 513 0012 284B     	 ldr r3,.L16+4
- 514 0014 1122     	 movs r2,#17
- 515 0016 5A71     	 strb r2,[r3,#5]
- 516              	.LBB2:
-  76:../variables.h **** 	for(uint8_t i = 0 ; i < 2; i++)
- 517              	 .loc 4 76 0
- 518 0018 0023     	 movs r3,#0
- 519 001a FB71     	 strb r3,[r7,#7]
- 520 001c 2FE0     	 b .L14
- 521              	.L15:
-  77:../variables.h **** 	{
-  78:../variables.h **** 		stanowisko.i_net[i] = 0;
- 522              	 .loc 4 78 0 discriminator 3
- 523 001e FB79     	 ldrb r3,[r7,#7]
- 524 0020 244A     	 ldr r2,.L16+4
- 525 0022 5B00     	 lsls r3,r3,#1
- 526 0024 1344     	 add r3,r3,r2
- 527 0026 0022     	 movs r2,#0
- 528 0028 DA80     	 strh r2,[r3,#6]
-  79:../variables.h **** 		stanowisko.kat_abs[i] = 0;
- 529              	 .loc 4 79 0 discriminator 3
- 530 002a FB79     	 ldrb r3,[r7,#7]
- 531 002c 214A     	 ldr r2,.L16+4
- 532 002e 0233     	 adds r3,r3,#2
- 533 0030 9B00     	 lsls r3,r3,#2
- 534 0032 1344     	 add r3,r3,r2
- 535 0034 0022     	 movs r2,#0
- 536 0036 5A60     	 str r2,[r3,#4]
-  80:../variables.h **** 		stanowisko.kat_abs_poprzedni[i] = 0;
- 537              	 .loc 4 80 0 discriminator 3
- 538 0038 FB79     	 ldrb r3,[r7,#7]
- 539 003a 1E4A     	 ldr r2,.L16+4
- 540 003c 0433     	 adds r3,r3,#4
- 541 003e 9B00     	 lsls r3,r3,#2
- 542 0040 1344     	 add r3,r3,r2
- 543 0042 4FF00002 	 mov r2,#0
- 544 0046 5A60     	 str r2,[r3,#4]
-  81:../variables.h **** 		stanowisko.predkosc_silnika[i] = 0;
- 545              	 .loc 4 81 0 discriminator 3
- 546 0048 FB79     	 ldrb r3,[r7,#7]
- 547 004a 1A4A     	 ldr r2,.L16+4
- 548 004c 0633     	 adds r3,r3,#6
- 549 004e 9B00     	 lsls r3,r3,#2
- 550 0050 1344     	 add r3,r3,r2
- 551 0052 4FF00002 	 mov r2,#0
- 552 0056 5A60     	 str r2,[r3,#4]
-  82:../variables.h **** 		stanowisko.silnik_start[i]  =0;
- 553              	 .loc 4 82 0 discriminator 3
- 554 0058 FB79     	 ldrb r3,[r7,#7]
- 555 005a 164A     	 ldr r2,.L16+4
- 556 005c 1344     	 add r3,r3,r2
- 557 005e 0022     	 movs r2,#0
- 558 0060 9A70     	 strb r2,[r3,#2]
-  83:../variables.h **** 		stanowisko.silnik_numer[i] = 0;
- 559              	 .loc 4 83 0 discriminator 3
- 560 0062 FB79     	 ldrb r3,[r7,#7]
- 561 0064 134A     	 ldr r2,.L16+4
- 562 0066 0021     	 movs r1,#0
- 563 0068 D154     	 strb r1,[r2,r3]
-  84:../variables.h **** 		stanowisko.Iq_zadane[i] = 0;
- 564              	 .loc 4 84 0 discriminator 3
- 565 006a FB79     	 ldrb r3,[r7,#7]
- 566 006c 114A     	 ldr r2,.L16+4
- 567 006e 1433     	 adds r3,r3,#20
- 568 0070 5B00     	 lsls r3,r3,#1
- 569 0072 1344     	 add r3,r3,r2
- 570 0074 0022     	 movs r2,#0
- 571 0076 5A80     	 strh r2,[r3,#2]
-  76:../variables.h **** 	{
- 572              	 .loc 4 76 0 discriminator 3
- 573 0078 FB79     	 ldrb r3,[r7,#7]
- 574 007a 0133     	 adds r3,r3,#1
- 575 007c FB71     	 strb r3,[r7,#7]
- 576              	.L14:
-  76:../variables.h **** 	{
- 577              	 .loc 4 76 0 is_stmt 0 discriminator 1
- 578 007e FB79     	 ldrb r3,[r7,#7]
- 579 0080 012B     	 cmp r3,#1
- 580 0082 CCD9     	 bls .L15
- 581              	.LBE2:
-  85:../variables.h **** 	}
-  86:../variables.h **** 	stanowisko.ks = 5050;
- 582              	 .loc 4 86 0 is_stmt 1
- 583 0084 0B4B     	 ldr r3,.L16+4
- 584 0086 41F2BA32 	 movw r2,#5050
- 585 008a 9A84     	 strh r2,[r3,#36]
-  87:../variables.h **** 	stanowisko.kd = 8;
- 586              	 .loc 4 87 0
- 587 008c 094B     	 ldr r3,.L16+4
- 588 008e 0822     	 movs r2,#8
- 589 0090 DA84     	 strh r2,[r3,#38]
-  88:../variables.h **** 	stanowisko.dzielnik = 100;
- 590              	 .loc 4 88 0
- 591 0092 084B     	 ldr r3,.L16+4
- 592 0094 6422     	 movs r2,#100
- 593 0096 1A85     	 strh r2,[r3,#40]
-  89:../variables.h **** 	stanowisko.stopa.x = 0;
- 594              	 .loc 4 89 0
- 595 0098 064B     	 ldr r3,.L16+4
- 596 009a 4FF00002 	 mov r2,#0
- 597 009e DA63     	 str r2,[r3,#60]
-  90:../variables.h **** 	stanowisko.stopa.y = 200;
- 598              	 .loc 4 90 0
- 599 00a0 044B     	 ldr r3,.L16+4
- 600 00a2 054A     	 ldr r2,.L16+8
- 601 00a4 1A64     	 str r2,[r3,#64]
-  91:../variables.h **** }
- 602              	 .loc 4 91 0
- 603 00a6 0C37     	 adds r7,r7,#12
- 604              	.LCFI47:
- 605              	 .cfi_def_cfa_offset 4
- 606 00a8 BD46     	 mov sp,r7
- 607              	.LCFI48:
- 608              	 .cfi_def_cfa_register 13
- 609              	 
- 610 00aa 5DF8047B 	 ldr r7,[sp],#4
- 611              	.LCFI49:
- 612              	 .cfi_restore 7
- 613              	 .cfi_def_cfa_offset 0
- 614 00ae 7047     	 bx lr
- 615              	.L17:
- 616              	 .align 2
- 617              	.L16:
- 618 00b0 00000000 	 .word txData
- 619 00b4 00000000 	 .word stanowisko
- 620 00b8 00004843 	 .word 1128792064
- 621              	 .cfi_endproc
- 622              	.LFE323:
- 624              	 .section .text.CCU43_1_IRQHandler,"ax",%progbits
- 625              	 .align 2
- 626              	 .global CCU43_1_IRQHandler
- 627              	 .thumb
- 628              	 .thumb_func
- 630              	CCU43_1_IRQHandler:
- 631              	.LFB324:
-  92:../variables.h **** void TIMER_IRQ()
-  93:../variables.h **** {
- 632              	 .loc 4 93 0
- 633              	 .cfi_startproc
- 634              	 
- 635              	 
- 636              	 
- 637 0000 80B4     	 push {r7}
- 638              	.LCFI50:
- 639              	 .cfi_def_cfa_offset 4
- 640              	 .cfi_offset 7,-4
- 641 0002 00AF     	 add r7,sp,#0
- 642              	.LCFI51:
- 643              	 .cfi_def_cfa_register 7
-  94:../variables.h **** 	is_delay = 0;
- 644              	 .loc 4 94 0
- 645 0004 034B     	 ldr r3,.L19
- 646 0006 0022     	 movs r2,#0
- 647 0008 1A70     	 strb r2,[r3]
-  95:../variables.h **** }
- 648              	 .loc 4 95 0
- 649 000a BD46     	 mov sp,r7
- 650              	.LCFI52:
- 651              	 .cfi_def_cfa_register 13
- 652              	 
- 653 000c 5DF8047B 	 ldr r7,[sp],#4
- 654              	.LCFI53:
- 655              	 .cfi_restore 7
- 656              	 .cfi_def_cfa_offset 0
- 657 0010 7047     	 bx lr
- 658              	.L20:
- 659 0012 00BF     	 .align 2
- 660              	.L19:
- 661 0014 00000000 	 .word is_delay
- 662              	 .cfi_endproc
- 663              	.LFE324:
- 665              	 .section .text.Ik,"ax",%progbits
- 666              	 .align 2
- 667              	 .global Ik
- 668              	 .thumb
- 669              	 .thumb_func
- 671              	Ik:
- 672              	.LFB325:
- 673              	 .file 5 "../kinematics.h"
+  23:../variables.h **** uint8_t is_delay = 1;							//is on active delay
+  24:../variables.h **** uint8_t init = 0;									//is initiated
+  25:../variables.h **** uint8_t motors_go = 0;						//are all motors go
+  26:../variables.h **** 
+  27:../variables.h **** struct vec2										//floating point 2d vector
+  28:../variables.h **** {
+  29:../variables.h **** 	float x;
+  30:../variables.h **** 	float y;
+  31:../variables.h **** };
+  32:../variables.h **** struct vec3										//floating point 3d vector
+  33:../variables.h **** {
+  34:../variables.h **** 	float x;
+  35:../variables.h **** 	float y;
+  36:../variables.h **** 	float z;
+  37:../variables.h **** };
+  38:../variables.h **** struct Leg											//structure holding leg parameters
+  39:../variables.h **** {
+  40:../variables.h **** 	uint8_t motor_n[2];						//driver numbers
+  41:../variables.h **** 	uint8_t motor_go[2];					//is motor go
+  42:../variables.h **** 	uint8_t adresy[2];							//adresses
+  43:../variables.h **** 	int16_t i_net[2];								//summarized current
+  44:../variables.h **** 	int32_t ang_abs[2];						//absolute angle of the motor
+  45:../variables.h **** 	float ang_abs_poprzedni[2];		//last absolute angle of the motor
+  46:../variables.h **** 	float predkosc_silnika[2];			//motor speed
+  47:../variables.h **** 	int16_t ks;										//virtal spring strength
+  48:../variables.h **** 	int16_t kd;										//virtual damper strength
+  49:../variables.h **** 	int32_t teta_int[2];							//commanded motor angle as 32bit integer
+  50:../variables.h **** 	int16_t poz_zad[2];						//commanded motor angle as 16bit integer
+  51:../variables.h **** 	struct vec2 foot;							//commanded foot position in milimeters in x-y reference frame
+  52:../variables.h **** 	float teta[2];									//commanded motor angle in radaians
+  53:../variables.h **** 	float ang_abs_rad[2];					//current motor angle in radians
+  54:../variables.h **** };
+  55:../variables.h **** struct Leg stanowisko;					//struct for test stand , a single leg
+  56:../variables.h **** 
+  57:../variables.h **** 
+  58:../variables.h **** void delay(uint32_t us)					//active delay
+  59:../variables.h **** {
+ 427              	 .loc 4 59 0
+ 428              	 .cfi_startproc
+ 429              	 
+ 430              	 
+ 431 0000 80B5     	 push {r7,lr}
+ 432              	.LCFI39:
+ 433              	 .cfi_def_cfa_offset 8
+ 434              	 .cfi_offset 7,-8
+ 435              	 .cfi_offset 14,-4
+ 436 0002 82B0     	 sub sp,sp,#8
+ 437              	.LCFI40:
+ 438              	 .cfi_def_cfa_offset 16
+ 439 0004 00AF     	 add r7,sp,#0
+ 440              	.LCFI41:
+ 441              	 .cfi_def_cfa_register 7
+ 442 0006 7860     	 str r0,[r7,#4]
+  60:../variables.h **** 	us *= 100;
+ 443              	 .loc 4 60 0
+ 444 0008 7B68     	 ldr r3,[r7,#4]
+ 445 000a 6422     	 movs r2,#100
+ 446 000c 02FB03F3 	 mul r3,r2,r3
+ 447 0010 7B60     	 str r3,[r7,#4]
+  61:../variables.h **** 	is_delay = 1;
+ 448              	 .loc 4 61 0
+ 449 0012 0A4B     	 ldr r3,.L11
+ 450 0014 0122     	 movs r2,#1
+ 451 0016 1A70     	 strb r2,[r3]
+  62:../variables.h **** 	TIMER_SetTimeInterval(&DELAY, us);
+ 452              	 .loc 4 62 0
+ 453 0018 0948     	 ldr r0,.L11+4
+ 454 001a 7968     	 ldr r1,[r7,#4]
+ 455 001c FFF7FEFF 	 bl TIMER_SetTimeInterval
+  63:../variables.h **** 	TIMER_Start(&DELAY);
+ 456              	 .loc 4 63 0
+ 457 0020 0748     	 ldr r0,.L11+4
+ 458 0022 FFF7FEFF 	 bl TIMER_Start
+  64:../variables.h **** 	while(is_delay);
+ 459              	 .loc 4 64 0
+ 460 0026 00BF     	 nop
+ 461              	.L10:
+ 462              	 .loc 4 64 0 is_stmt 0 discriminator 1
+ 463 0028 044B     	 ldr r3,.L11
+ 464 002a 1B78     	 ldrb r3,[r3]
+ 465 002c 002B     	 cmp r3,#0
+ 466 002e FBD1     	 bne .L10
+  65:../variables.h **** 	TIMER_Stop(&DELAY);
+ 467              	 .loc 4 65 0 is_stmt 1
+ 468 0030 0348     	 ldr r0,.L11+4
+ 469 0032 FFF7FEFF 	 bl TIMER_Stop
+  66:../variables.h **** }
+ 470              	 .loc 4 66 0
+ 471 0036 0837     	 adds r7,r7,#8
+ 472              	.LCFI42:
+ 473              	 .cfi_def_cfa_offset 8
+ 474 0038 BD46     	 mov sp,r7
+ 475              	.LCFI43:
+ 476              	 .cfi_def_cfa_register 13
+ 477              	 
+ 478 003a 80BD     	 pop {r7,pc}
+ 479              	.L12:
+ 480              	 .align 2
+ 481              	.L11:
+ 482 003c 00000000 	 .word is_delay
+ 483 0040 00000000 	 .word DELAY
+ 484              	 .cfi_endproc
+ 485              	.LFE322:
+ 487              	 .section .text.Init,"ax",%progbits
+ 488              	 .align 2
+ 489              	 .global Init
+ 490              	 .thumb
+ 491              	 .thumb_func
+ 493              	Init:
+ 494              	.LFB323:
+  67:../variables.h **** 
+  68:../variables.h **** void Init()			//initialization function for test stand
+  69:../variables.h **** {
+ 495              	 .loc 4 69 0
+ 496              	 .cfi_startproc
+ 497              	 
+ 498              	 
+ 499              	 
+ 500 0000 80B4     	 push {r7}
+ 501              	.LCFI44:
+ 502              	 .cfi_def_cfa_offset 4
+ 503              	 .cfi_offset 7,-4
+ 504 0002 83B0     	 sub sp,sp,#12
+ 505              	.LCFI45:
+ 506              	 .cfi_def_cfa_offset 16
+ 507 0004 00AF     	 add r7,sp,#0
+ 508              	.LCFI46:
+ 509              	 .cfi_def_cfa_register 7
+  70:../variables.h **** 	txData[0] = SOF;
+ 510              	 .loc 4 70 0
+ 511 0006 254B     	 ldr r3,.L16
+ 512 0008 CC22     	 movs r2,#204
+ 513 000a 1A70     	 strb r2,[r3]
+  71:../variables.h **** 	stanowisko.adresy[0] = 0x10;
+ 514              	 .loc 4 71 0
+ 515 000c 244B     	 ldr r3,.L16+4
+ 516 000e 1022     	 movs r2,#16
+ 517 0010 1A71     	 strb r2,[r3,#4]
+  72:../variables.h **** 	stanowisko.adresy[1] = 0x11;
+ 518              	 .loc 4 72 0
+ 519 0012 234B     	 ldr r3,.L16+4
+ 520 0014 1122     	 movs r2,#17
+ 521 0016 5A71     	 strb r2,[r3,#5]
+ 522              	.LBB2:
+  73:../variables.h **** 	for(uint8_t i = 0 ; i < 2; i++)
+ 523              	 .loc 4 73 0
+ 524 0018 0023     	 movs r3,#0
+ 525 001a FB71     	 strb r3,[r7,#7]
+ 526 001c 28E0     	 b .L14
+ 527              	.L15:
+  74:../variables.h **** 	{
+  75:../variables.h **** 		stanowisko.i_net[i] = 0;
+ 528              	 .loc 4 75 0 discriminator 3
+ 529 001e FB79     	 ldrb r3,[r7,#7]
+ 530 0020 1F4A     	 ldr r2,.L16+4
+ 531 0022 5B00     	 lsls r3,r3,#1
+ 532 0024 1344     	 add r3,r3,r2
+ 533 0026 0022     	 movs r2,#0
+ 534 0028 DA80     	 strh r2,[r3,#6]
+  76:../variables.h **** 		stanowisko.ang_abs[i] = 0;
+ 535              	 .loc 4 76 0 discriminator 3
+ 536 002a FB79     	 ldrb r3,[r7,#7]
+ 537 002c 1C4A     	 ldr r2,.L16+4
+ 538 002e 0233     	 adds r3,r3,#2
+ 539 0030 9B00     	 lsls r3,r3,#2
+ 540 0032 1344     	 add r3,r3,r2
+ 541 0034 0022     	 movs r2,#0
+ 542 0036 5A60     	 str r2,[r3,#4]
+  77:../variables.h **** 		stanowisko.ang_abs_poprzedni[i] = 0;
+ 543              	 .loc 4 77 0 discriminator 3
+ 544 0038 FB79     	 ldrb r3,[r7,#7]
+ 545 003a 194A     	 ldr r2,.L16+4
+ 546 003c 0433     	 adds r3,r3,#4
+ 547 003e 9B00     	 lsls r3,r3,#2
+ 548 0040 1344     	 add r3,r3,r2
+ 549 0042 4FF00002 	 mov r2,#0
+ 550 0046 5A60     	 str r2,[r3,#4]
+  78:../variables.h **** 		stanowisko.predkosc_silnika[i] = 0;
+ 551              	 .loc 4 78 0 discriminator 3
+ 552 0048 FB79     	 ldrb r3,[r7,#7]
+ 553 004a 154A     	 ldr r2,.L16+4
+ 554 004c 0633     	 adds r3,r3,#6
+ 555 004e 9B00     	 lsls r3,r3,#2
+ 556 0050 1344     	 add r3,r3,r2
+ 557 0052 4FF00002 	 mov r2,#0
+ 558 0056 5A60     	 str r2,[r3,#4]
+  79:../variables.h **** 		stanowisko.motor_go[i]  =0;
+ 559              	 .loc 4 79 0 discriminator 3
+ 560 0058 FB79     	 ldrb r3,[r7,#7]
+ 561 005a 114A     	 ldr r2,.L16+4
+ 562 005c 1344     	 add r3,r3,r2
+ 563 005e 0022     	 movs r2,#0
+ 564 0060 9A70     	 strb r2,[r3,#2]
+  80:../variables.h **** 		stanowisko.motor_n[i] = 0;
+ 565              	 .loc 4 80 0 discriminator 3
+ 566 0062 FB79     	 ldrb r3,[r7,#7]
+ 567 0064 0E4A     	 ldr r2,.L16+4
+ 568 0066 0021     	 movs r1,#0
+ 569 0068 D154     	 strb r1,[r2,r3]
+  73:../variables.h **** 	{
+ 570              	 .loc 4 73 0 discriminator 3
+ 571 006a FB79     	 ldrb r3,[r7,#7]
+ 572 006c 0133     	 adds r3,r3,#1
+ 573 006e FB71     	 strb r3,[r7,#7]
+ 574              	.L14:
+  73:../variables.h **** 	{
+ 575              	 .loc 4 73 0 is_stmt 0 discriminator 1
+ 576 0070 FB79     	 ldrb r3,[r7,#7]
+ 577 0072 012B     	 cmp r3,#1
+ 578 0074 D3D9     	 bls .L15
+ 579              	.LBE2:
+  81:../variables.h **** 	}
+  82:../variables.h **** 	stanowisko.ks = 5050;
+ 580              	 .loc 4 82 0 is_stmt 1
+ 581 0076 0A4B     	 ldr r3,.L16+4
+ 582 0078 41F2BA32 	 movw r2,#5050
+ 583 007c 9A84     	 strh r2,[r3,#36]
+  83:../variables.h **** 	stanowisko.kd = 8;
+ 584              	 .loc 4 83 0
+ 585 007e 084B     	 ldr r3,.L16+4
+ 586 0080 0822     	 movs r2,#8
+ 587 0082 DA84     	 strh r2,[r3,#38]
+  84:../variables.h **** 	stanowisko.foot.x = 0;
+ 588              	 .loc 4 84 0
+ 589 0084 064B     	 ldr r3,.L16+4
+ 590 0086 4FF00002 	 mov r2,#0
+ 591 008a 5A63     	 str r2,[r3,#52]
+  85:../variables.h **** 	stanowisko.foot.y = 200;
+ 592              	 .loc 4 85 0
+ 593 008c 044B     	 ldr r3,.L16+4
+ 594 008e 054A     	 ldr r2,.L16+8
+ 595 0090 9A63     	 str r2,[r3,#56]
+  86:../variables.h **** }
+ 596              	 .loc 4 86 0
+ 597 0092 0C37     	 adds r7,r7,#12
+ 598              	.LCFI47:
+ 599              	 .cfi_def_cfa_offset 4
+ 600 0094 BD46     	 mov sp,r7
+ 601              	.LCFI48:
+ 602              	 .cfi_def_cfa_register 13
+ 603              	 
+ 604 0096 5DF8047B 	 ldr r7,[sp],#4
+ 605              	.LCFI49:
+ 606              	 .cfi_restore 7
+ 607              	 .cfi_def_cfa_offset 0
+ 608 009a 7047     	 bx lr
+ 609              	.L17:
+ 610              	 .align 2
+ 611              	.L16:
+ 612 009c 00000000 	 .word txData
+ 613 00a0 00000000 	 .word stanowisko
+ 614 00a4 00004843 	 .word 1128792064
+ 615              	 .cfi_endproc
+ 616              	.LFE323:
+ 618              	 .section .text.CCU43_1_IRQHandler,"ax",%progbits
+ 619              	 .align 2
+ 620              	 .global CCU43_1_IRQHandler
+ 621              	 .thumb
+ 622              	 .thumb_func
+ 624              	CCU43_1_IRQHandler:
+ 625              	.LFB324:
+  87:../variables.h **** void TIMER_IRQ()				//delay interrupt
+  88:../variables.h **** {
+ 626              	 .loc 4 88 0
+ 627              	 .cfi_startproc
+ 628              	 
+ 629              	 
+ 630              	 
+ 631 0000 80B4     	 push {r7}
+ 632              	.LCFI50:
+ 633              	 .cfi_def_cfa_offset 4
+ 634              	 .cfi_offset 7,-4
+ 635 0002 00AF     	 add r7,sp,#0
+ 636              	.LCFI51:
+ 637              	 .cfi_def_cfa_register 7
+  89:../variables.h **** 	is_delay = 0;
+ 638              	 .loc 4 89 0
+ 639 0004 034B     	 ldr r3,.L19
+ 640 0006 0022     	 movs r2,#0
+ 641 0008 1A70     	 strb r2,[r3]
+  90:../variables.h **** }
+ 642              	 .loc 4 90 0
+ 643 000a BD46     	 mov sp,r7
+ 644              	.LCFI52:
+ 645              	 .cfi_def_cfa_register 13
+ 646              	 
+ 647 000c 5DF8047B 	 ldr r7,[sp],#4
+ 648              	.LCFI53:
+ 649              	 .cfi_restore 7
+ 650              	 .cfi_def_cfa_offset 0
+ 651 0010 7047     	 bx lr
+ 652              	.L20:
+ 653 0012 00BF     	 .align 2
+ 654              	.L19:
+ 655 0014 00000000 	 .word is_delay
+ 656              	 .cfi_endproc
+ 657              	.LFE324:
+ 659              	 .section .text.Ik,"ax",%progbits
+ 660              	 .align 2
+ 661              	 .global Ik
+ 662              	 .thumb
+ 663              	 .thumb_func
+ 665              	Ik:
+ 666              	.LFB325:
+ 667              	 .file 5 "../kinematics.h"
    1:../kinematics.h **** /*
    2:../kinematics.h ****  * kinematics.h
    3:../kinematics.h ****  *
@@ -3536,637 +3523,638 @@
    5:../kinematics.h ****  *      Author: Mafish
    6:../kinematics.h ****  */
    7:../kinematics.h **** 
-   8:../kinematics.h **** void Ik(struct Leg *n);
-   9:../kinematics.h **** void Fk(struct Leg *n);
-  10:../kinematics.h **** void update(struct Leg *n);
-  11:../kinematics.h **** 
-  12:../kinematics.h **** void Ik(struct Leg *n)
-  13:../kinematics.h **** {
- 674              	 .loc 5 13 0
- 675              	 .cfi_startproc
- 676              	 
- 677              	 
- 678 0000 80B5     	 push {r7,lr}
- 679              	.LCFI54:
- 680              	 .cfi_def_cfa_offset 8
- 681              	 .cfi_offset 7,-8
- 682              	 .cfi_offset 14,-4
- 683 0002 8AB0     	 sub sp,sp,#40
- 684              	.LCFI55:
- 685              	 .cfi_def_cfa_offset 48
- 686 0004 00AF     	 add r7,sp,#0
- 687              	.LCFI56:
- 688              	 .cfi_def_cfa_register 7
- 689 0006 7860     	 str r0,[r7,#4]
-  14:../kinematics.h **** 	float x = n->stopa.x;
- 690              	 .loc 5 14 0
- 691 0008 7B68     	 ldr r3,[r7,#4]
- 692 000a DB6B     	 ldr r3,[r3,#60]
- 693 000c 7B62     	 str r3,[r7,#36]
-  15:../kinematics.h **** 	float y = n->stopa.y;
- 694              	 .loc 5 15 0
- 695 000e 7B68     	 ldr r3,[r7,#4]
- 696 0010 1B6C     	 ldr r3,[r3,#64]
- 697 0012 3B62     	 str r3,[r7,#32]
-  16:../kinematics.h **** 	float La = sqrtf(((d/2)-x)*((d/2)-x)+y*y);
- 698              	 .loc 5 16 0
- 699 0014 6E4B     	 ldr r3,.L22
- 700 0016 D3ED007A 	 flds s15,[r3]
- 701 001a B0EE007A 	 fconsts s14,#0
- 702 001e 87EE877A 	 fdivs s14,s15,s14
- 703 0022 D7ED097A 	 flds s15,[r7,#36]
- 704 0026 37EE677A 	 fsubs s14,s14,s15
- 705 002a 694B     	 ldr r3,.L22
- 706 002c D3ED007A 	 flds s15,[r3]
- 707 0030 F0EE006A 	 fconsts s13,#0
- 708 0034 C7EEA66A 	 fdivs s13,s15,s13
- 709 0038 D7ED097A 	 flds s15,[r7,#36]
- 710 003c 76EEE77A 	 fsubs s15,s13,s15
- 711 0040 27EE277A 	 fmuls s14,s14,s15
- 712 0044 D7ED086A 	 flds s13,[r7,#32]
- 713 0048 D7ED087A 	 flds s15,[r7,#32]
- 714 004c 66EEA77A 	 fmuls s15,s13,s15
- 715 0050 77EE277A 	 fadds s15,s14,s15
- 716 0054 17EE900A 	 fmrs r0,s15
- 717 0058 FFF7FEFF 	 bl sqrtf
- 718 005c F861     	 str r0,[r7,#28]
-  17:../kinematics.h **** 	float Lb = sqrtf(((d/2)+x)*((d/2)+x)+y*y);
- 719              	 .loc 5 17 0
- 720 005e 5C4B     	 ldr r3,.L22
- 721 0060 D3ED007A 	 flds s15,[r3]
- 722 0064 B0EE007A 	 fconsts s14,#0
- 723 0068 87EE877A 	 fdivs s14,s15,s14
- 724 006c D7ED097A 	 flds s15,[r7,#36]
- 725 0070 37EE277A 	 fadds s14,s14,s15
- 726 0074 564B     	 ldr r3,.L22
- 727 0076 D3ED007A 	 flds s15,[r3]
- 728 007a F0EE006A 	 fconsts s13,#0
- 729 007e C7EEA66A 	 fdivs s13,s15,s13
- 730 0082 D7ED097A 	 flds s15,[r7,#36]
- 731 0086 76EEA77A 	 fadds s15,s13,s15
- 732 008a 27EE277A 	 fmuls s14,s14,s15
- 733 008e D7ED086A 	 flds s13,[r7,#32]
- 734 0092 D7ED087A 	 flds s15,[r7,#32]
- 735 0096 66EEA77A 	 fmuls s15,s13,s15
- 736 009a 77EE277A 	 fadds s15,s14,s15
- 737 009e 17EE900A 	 fmrs r0,s15
- 738 00a2 FFF7FEFF 	 bl sqrtf
- 739 00a6 B861     	 str r0,[r7,#24]
-  18:../kinematics.h **** 	float fi1 = (l1*l1+La*La-l2*l2)/(2*l1*La);
- 740              	 .loc 5 18 0
- 741 00a8 4A4B     	 ldr r3,.L22+4
- 742 00aa 93ED007A 	 flds s14,[r3]
- 743 00ae 494B     	 ldr r3,.L22+4
- 744 00b0 D3ED007A 	 flds s15,[r3]
- 745 00b4 27EE277A 	 fmuls s14,s14,s15
- 746 00b8 D7ED076A 	 flds s13,[r7,#28]
- 747 00bc D7ED077A 	 flds s15,[r7,#28]
- 748 00c0 66EEA77A 	 fmuls s15,s13,s15
- 749 00c4 37EE277A 	 fadds s14,s14,s15
- 750 00c8 434B     	 ldr r3,.L22+8
- 751 00ca D3ED006A 	 flds s13,[r3]
- 752 00ce 424B     	 ldr r3,.L22+8
- 753 00d0 D3ED007A 	 flds s15,[r3]
- 754 00d4 66EEA77A 	 fmuls s15,s13,s15
- 755 00d8 37EE677A 	 fsubs s14,s14,s15
- 756 00dc 3D4B     	 ldr r3,.L22+4
- 757 00de D3ED007A 	 flds s15,[r3]
- 758 00e2 77EEA76A 	 fadds s13,s15,s15
- 759 00e6 D7ED077A 	 flds s15,[r7,#28]
- 760 00ea 66EEA77A 	 fmuls s15,s13,s15
- 761 00ee C7EE277A 	 fdivs s15,s14,s15
- 762 00f2 C7ED057A 	 fsts s15,[r7,#20]
-  19:../kinematics.h **** 	fi1 = acosf(fi1);
- 763              	 .loc 5 19 0
- 764 00f6 7869     	 ldr r0,[r7,#20]
- 765 00f8 FFF7FEFF 	 bl acosf
- 766 00fc 7861     	 str r0,[r7,#20]
-  20:../kinematics.h **** 	float fi2 = (l1*l1+Lb*Lb-l2*l2)/(2*l1*Lb);
- 767              	 .loc 5 20 0
- 768 00fe 354B     	 ldr r3,.L22+4
- 769 0100 93ED007A 	 flds s14,[r3]
- 770 0104 334B     	 ldr r3,.L22+4
- 771 0106 D3ED007A 	 flds s15,[r3]
- 772 010a 27EE277A 	 fmuls s14,s14,s15
- 773 010e D7ED066A 	 flds s13,[r7,#24]
- 774 0112 D7ED067A 	 flds s15,[r7,#24]
- 775 0116 66EEA77A 	 fmuls s15,s13,s15
- 776 011a 37EE277A 	 fadds s14,s14,s15
- 777 011e 2E4B     	 ldr r3,.L22+8
- 778 0120 D3ED006A 	 flds s13,[r3]
- 779 0124 2C4B     	 ldr r3,.L22+8
- 780 0126 D3ED007A 	 flds s15,[r3]
- 781 012a 66EEA77A 	 fmuls s15,s13,s15
- 782 012e 37EE677A 	 fsubs s14,s14,s15
- 783 0132 284B     	 ldr r3,.L22+4
- 784 0134 D3ED007A 	 flds s15,[r3]
- 785 0138 77EEA76A 	 fadds s13,s15,s15
- 786 013c D7ED067A 	 flds s15,[r7,#24]
- 787 0140 66EEA77A 	 fmuls s15,s13,s15
- 788 0144 C7EE277A 	 fdivs s15,s14,s15
- 789 0148 C7ED047A 	 fsts s15,[r7,#16]
-  21:../kinematics.h **** 	fi2 = acosf(fi2);
- 790              	 .loc 5 21 0
- 791 014c 3869     	 ldr r0,[r7,#16]
- 792 014e FFF7FEFF 	 bl acosf
- 793 0152 3861     	 str r0,[r7,#16]
-  22:../kinematics.h **** 	float psi1 = asinf(((d/2)-x)/La);
- 794              	 .loc 5 22 0
- 795 0154 1E4B     	 ldr r3,.L22
- 796 0156 D3ED007A 	 flds s15,[r3]
- 797 015a B0EE007A 	 fconsts s14,#0
- 798 015e 87EE877A 	 fdivs s14,s15,s14
- 799 0162 D7ED097A 	 flds s15,[r7,#36]
- 800 0166 37EE677A 	 fsubs s14,s14,s15
- 801 016a D7ED077A 	 flds s15,[r7,#28]
- 802 016e C7EE277A 	 fdivs s15,s14,s15
- 803 0172 17EE900A 	 fmrs r0,s15
- 804 0176 FFF7FEFF 	 bl asinf
- 805 017a F860     	 str r0,[r7,#12]
-  23:../kinematics.h **** 	float psi2 = asinf(((d/2)+x)/Lb);
- 806              	 .loc 5 23 0
- 807 017c 144B     	 ldr r3,.L22
- 808 017e D3ED007A 	 flds s15,[r3]
- 809 0182 B0EE007A 	 fconsts s14,#0
- 810 0186 87EE877A 	 fdivs s14,s15,s14
- 811 018a D7ED097A 	 flds s15,[r7,#36]
- 812 018e 37EE277A 	 fadds s14,s14,s15
- 813 0192 D7ED067A 	 flds s15,[r7,#24]
- 814 0196 C7EE277A 	 fdivs s15,s14,s15
- 815 019a 17EE900A 	 fmrs r0,s15
- 816 019e FFF7FEFF 	 bl asinf
- 817 01a2 B860     	 str r0,[r7,#8]
-  24:../kinematics.h **** 
-  25:../kinematics.h **** 	n->teta[0] = fi1 - psi1;
- 818              	 .loc 5 25 0
- 819 01a4 97ED057A 	 flds s14,[r7,#20]
- 820 01a8 D7ED037A 	 flds s15,[r7,#12]
- 821 01ac 77EE677A 	 fsubs s15,s14,s15
- 822 01b0 7B68     	 ldr r3,[r7,#4]
- 823 01b2 C3ED117A 	 fsts s15,[r3,#68]
-  26:../kinematics.h **** 	n->teta[1] = fi2 - psi2;
- 824              	 .loc 5 26 0
- 825 01b6 97ED047A 	 flds s14,[r7,#16]
- 826 01ba D7ED027A 	 flds s15,[r7,#8]
- 827 01be 77EE677A 	 fsubs s15,s14,s15
- 828 01c2 7B68     	 ldr r3,[r7,#4]
- 829 01c4 C3ED127A 	 fsts s15,[r3,#72]
-  27:../kinematics.h **** }
- 830              	 .loc 5 27 0
- 831 01c8 2837     	 adds r7,r7,#40
- 832              	.LCFI57:
- 833              	 .cfi_def_cfa_offset 8
- 834 01ca BD46     	 mov sp,r7
- 835              	.LCFI58:
- 836              	 .cfi_def_cfa_register 13
- 837              	 
- 838 01cc 80BD     	 pop {r7,pc}
- 839              	.L23:
- 840 01ce 00BF     	 .align 2
- 841              	.L22:
- 842 01d0 00000000 	 .word d
- 843 01d4 00000000 	 .word l1
- 844 01d8 00000000 	 .word l2
- 845              	 .cfi_endproc
- 846              	.LFE325:
- 848              	 .global __aeabi_f2d
- 849              	 .global __aeabi_dmul
- 850              	 .global __aeabi_dsub
- 851              	 .global __aeabi_dadd
- 852              	 .global __aeabi_d2f
- 853              	 .section .text.Fk,"ax",%progbits
- 854              	 .align 2
- 855              	 .global Fk
- 856              	 .thumb
- 857              	 .thumb_func
- 859              	Fk:
- 860              	.LFB326:
-  28:../kinematics.h **** void Fk(struct Leg *n)
-  29:../kinematics.h **** {
- 861              	 .loc 5 29 0
- 862              	 .cfi_startproc
- 863              	 
- 864              	 
- 865 0000 2DE9B043 	 push {r4,r5,r7,r8,r9,lr}
- 866              	.LCFI59:
- 867              	 .cfi_def_cfa_offset 24
- 868              	 .cfi_offset 4,-24
- 869              	 .cfi_offset 5,-20
- 870              	 .cfi_offset 7,-16
- 871              	 .cfi_offset 8,-12
- 872              	 .cfi_offset 9,-8
- 873              	 .cfi_offset 14,-4
- 874 0004 2DED028B 	 fstmfdd sp!,{d8}
- 875              	.LCFI60:
- 876              	 .cfi_def_cfa_offset 32
- 877              	 .cfi_offset 80,-32
- 878              	 .cfi_offset 81,-28
- 879 0008 8CB0     	 sub sp,sp,#48
- 880              	.LCFI61:
- 881              	 .cfi_def_cfa_offset 80
- 882 000a 00AF     	 add r7,sp,#0
- 883              	.LCFI62:
- 884              	 .cfi_def_cfa_register 7
- 885 000c 7860     	 str r0,[r7,#4]
-  30:../kinematics.h **** 	float a = d + l1*(sinf(n->teta[1]) + sinf(n->teta[0])) ;
- 886              	 .loc 5 30 0
- 887 000e 7B68     	 ldr r3,[r7,#4]
- 888 0010 9B6C     	 ldr r3,[r3,#72]
- 889 0012 1846     	 mov r0,r3
- 890 0014 FFF7FEFF 	 bl sinf
- 891 0018 08EE100A 	 fmsr s16,r0
- 892 001c 7B68     	 ldr r3,[r7,#4]
- 893 001e 5B6C     	 ldr r3,[r3,#68]
- 894 0020 1846     	 mov r0,r3
- 895 0022 FFF7FEFF 	 bl sinf
- 896 0026 07EE900A 	 fmsr s15,r0
- 897 002a 38EE277A 	 fadds s14,s16,s15
- 898 002e 694B     	 ldr r3,.L25
- 899 0030 D3ED007A 	 flds s15,[r3]
- 900 0034 27EE277A 	 fmuls s14,s14,s15
- 901 0038 674B     	 ldr r3,.L25+4
- 902 003a D3ED007A 	 flds s15,[r3]
- 903 003e 77EE277A 	 fadds s15,s14,s15
- 904 0042 C7ED0B7A 	 fsts s15,[r7,#44]
-  31:../kinematics.h **** 	float b = l1 * (cosf(n->teta[1]) - cosf(n->teta[0]));
- 905              	 .loc 5 31 0
- 906 0046 7B68     	 ldr r3,[r7,#4]
- 907 0048 9B6C     	 ldr r3,[r3,#72]
- 908 004a 1846     	 mov r0,r3
- 909 004c FFF7FEFF 	 bl cosf
- 910 0050 08EE100A 	 fmsr s16,r0
- 911 0054 7B68     	 ldr r3,[r7,#4]
- 912 0056 5B6C     	 ldr r3,[r3,#68]
- 913 0058 1846     	 mov r0,r3
- 914 005a FFF7FEFF 	 bl cosf
- 915 005e 07EE900A 	 fmsr s15,r0
- 916 0062 38EE677A 	 fsubs s14,s16,s15
- 917 0066 5B4B     	 ldr r3,.L25
- 918 0068 D3ED007A 	 flds s15,[r3]
- 919 006c 67EE277A 	 fmuls s15,s14,s15
- 920 0070 C7ED0A7A 	 fsts s15,[r7,#40]
-  32:../kinematics.h **** 	float p = sqrtf(a*a + b*b);
- 921              	 .loc 5 32 0
- 922 0074 97ED0B7A 	 flds s14,[r7,#44]
- 923 0078 D7ED0B7A 	 flds s15,[r7,#44]
- 924 007c 27EE277A 	 fmuls s14,s14,s15
- 925 0080 D7ED0A6A 	 flds s13,[r7,#40]
- 926 0084 D7ED0A7A 	 flds s15,[r7,#40]
- 927 0088 66EEA77A 	 fmuls s15,s13,s15
- 928 008c 77EE277A 	 fadds s15,s14,s15
- 929 0090 17EE900A 	 fmrs r0,s15
- 930 0094 FFF7FEFF 	 bl sqrtf
- 931 0098 7862     	 str r0,[r7,#36]
-  33:../kinematics.h **** 	float fi = atan2f(b,a);
- 932              	 .loc 5 33 0
- 933 009a B86A     	 ldr r0,[r7,#40]
- 934 009c F96A     	 ldr r1,[r7,#44]
- 935 009e FFF7FEFF 	 bl atan2f
- 936 00a2 3862     	 str r0,[r7,#32]
-  34:../kinematics.h **** 	float theta = asinf(p / 2*l2);
- 937              	 .loc 5 34 0
- 938 00a4 D7ED097A 	 flds s15,[r7,#36]
- 939 00a8 B0EE007A 	 fconsts s14,#0
- 940 00ac 87EE877A 	 fdivs s14,s15,s14
- 941 00b0 4A4B     	 ldr r3,.L25+8
- 942 00b2 D3ED007A 	 flds s15,[r3]
- 943 00b6 67EE277A 	 fmuls s15,s14,s15
- 944 00ba 17EE900A 	 fmrs r0,s15
- 945 00be FFF7FEFF 	 bl asinf
- 946 00c2 F861     	 str r0,[r7,#28]
-  35:../kinematics.h **** 	float gamma = pi / 2 - theta;
- 947              	 .loc 5 35 0
- 948 00c4 464B     	 ldr r3,.L25+12
- 949 00c6 D3ED007A 	 flds s15,[r3]
- 950 00ca B0EE007A 	 fconsts s14,#0
- 951 00ce 87EE877A 	 fdivs s14,s15,s14
- 952 00d2 D7ED077A 	 flds s15,[r7,#28]
- 953 00d6 77EE677A 	 fsubs s15,s14,s15
- 954 00da C7ED067A 	 fsts s15,[r7,#24]
-  36:../kinematics.h **** 	float psi = gamma + fi;
- 955              	 .loc 5 36 0
- 956 00de 97ED067A 	 flds s14,[r7,#24]
- 957 00e2 D7ED087A 	 flds s15,[r7,#32]
- 958 00e6 77EE277A 	 fadds s15,s14,s15
- 959 00ea C7ED057A 	 fsts s15,[r7,#20]
-  37:../kinematics.h **** 	struct vec2 xy;
-  38:../kinematics.h **** 	xy.x = d/2 - l1*sin(n->teta[0]) + l2*cosf(psi);
- 960              	 .loc 5 38 0
- 961 00ee 3A4B     	 ldr r3,.L25+4
- 962 00f0 D3ED007A 	 flds s15,[r3]
- 963 00f4 B0EE007A 	 fconsts s14,#0
- 964 00f8 C7EE877A 	 fdivs s15,s15,s14
- 965 00fc 17EE900A 	 fmrs r0,s15
- 966 0100 FFF7FEFF 	 bl __aeabi_f2d
- 967 0104 0446     	 mov r4,r0
- 968 0106 0D46     	 mov r5,r1
- 969 0108 324B     	 ldr r3,.L25
- 970 010a 1B68     	 ldr r3,[r3]
- 971 010c 1846     	 mov r0,r3
- 972 010e FFF7FEFF 	 bl __aeabi_f2d
- 973 0112 8046     	 mov r8,r0
- 974 0114 8946     	 mov r9,r1
- 975 0116 7B68     	 ldr r3,[r7,#4]
- 976 0118 5B6C     	 ldr r3,[r3,#68]
- 977 011a 1846     	 mov r0,r3
- 978 011c FFF7FEFF 	 bl __aeabi_f2d
- 979 0120 0246     	 mov r2,r0
- 980 0122 0B46     	 mov r3,r1
- 981 0124 1046     	 mov r0,r2
- 982 0126 1946     	 mov r1,r3
- 983 0128 FFF7FEFF 	 bl sin
- 984 012c 0246     	 mov r2,r0
- 985 012e 0B46     	 mov r3,r1
- 986 0130 4046     	 mov r0,r8
- 987 0132 4946     	 mov r1,r9
- 988 0134 FFF7FEFF 	 bl __aeabi_dmul
- 989 0138 0246     	 mov r2,r0
- 990 013a 0B46     	 mov r3,r1
- 991 013c 2046     	 mov r0,r4
- 992 013e 2946     	 mov r1,r5
- 993 0140 FFF7FEFF 	 bl __aeabi_dsub
- 994 0144 0246     	 mov r2,r0
- 995 0146 0B46     	 mov r3,r1
- 996 0148 1446     	 mov r4,r2
- 997 014a 1D46     	 mov r5,r3
- 998 014c 7869     	 ldr r0,[r7,#20]
- 999 014e FFF7FEFF 	 bl cosf
- 1000 0152 07EE100A 	 fmsr s14,r0
- 1001 0156 214B     	 ldr r3,.L25+8
- 1002 0158 D3ED007A 	 flds s15,[r3]
- 1003 015c 67EE277A 	 fmuls s15,s14,s15
- 1004 0160 17EE900A 	 fmrs r0,s15
- 1005 0164 FFF7FEFF 	 bl __aeabi_f2d
- 1006 0168 0246     	 mov r2,r0
- 1007 016a 0B46     	 mov r3,r1
- 1008 016c 2046     	 mov r0,r4
- 1009 016e 2946     	 mov r1,r5
- 1010 0170 FFF7FEFF 	 bl __aeabi_dadd
- 1011 0174 0246     	 mov r2,r0
- 1012 0176 0B46     	 mov r3,r1
- 1013 0178 1046     	 mov r0,r2
- 1014 017a 1946     	 mov r1,r3
- 1015 017c FFF7FEFF 	 bl __aeabi_d2f
- 1016 0180 0346     	 mov r3,r0
- 1017 0182 FB60     	 str r3,[r7,#12]
-  39:../kinematics.h **** 	xy.y = l1*cosf(n->teta[0]) + l2* cosf(psi);
- 1018              	 .loc 5 39 0
- 1019 0184 7B68     	 ldr r3,[r7,#4]
- 1020 0186 5B6C     	 ldr r3,[r3,#68]
- 1021 0188 1846     	 mov r0,r3
- 1022 018a FFF7FEFF 	 bl cosf
- 1023 018e 07EE100A 	 fmsr s14,r0
- 1024 0192 104B     	 ldr r3,.L25
- 1025 0194 D3ED007A 	 flds s15,[r3]
- 1026 0198 27EE278A 	 fmuls s16,s14,s15
- 1027 019c 7869     	 ldr r0,[r7,#20]
- 1028 019e FFF7FEFF 	 bl cosf
- 1029 01a2 07EE100A 	 fmsr s14,r0
- 1030 01a6 0D4B     	 ldr r3,.L25+8
- 1031 01a8 D3ED007A 	 flds s15,[r3]
- 1032 01ac 67EE277A 	 fmuls s15,s14,s15
- 1033 01b0 78EE277A 	 fadds s15,s16,s15
- 1034 01b4 C7ED047A 	 fsts s15,[r7,#16]
-  40:../kinematics.h **** 	n->stopa = xy;
- 1035              	 .loc 5 40 0
- 1036 01b8 7B68     	 ldr r3,[r7,#4]
- 1037 01ba 3C33     	 adds r3,r3,#60
- 1038 01bc 07F10C02 	 add r2,r7,#12
- 1039 01c0 92E80300 	 ldmia r2,{r0,r1}
- 1040 01c4 83E80300 	 stmia r3,{r0,r1}
-  41:../kinematics.h **** }
- 1041              	 .loc 5 41 0
- 1042 01c8 3037     	 adds r7,r7,#48
- 1043              	.LCFI63:
- 1044              	 .cfi_def_cfa_offset 32
- 1045 01ca BD46     	 mov sp,r7
- 1046              	.LCFI64:
- 1047              	 .cfi_def_cfa_register 13
- 1048              	 
- 1049 01cc BDEC028B 	 fldmfdd sp!,{d8}
- 1050              	.LCFI65:
- 1051              	 .cfi_restore 80
- 1052              	 .cfi_restore 81
- 1053              	 .cfi_def_cfa_offset 24
- 1054 01d0 BDE8B083 	 pop {r4,r5,r7,r8,r9,pc}
- 1055              	.L26:
- 1056              	 .align 2
- 1057              	.L25:
- 1058 01d4 00000000 	 .word l1
- 1059 01d8 00000000 	 .word d
- 1060 01dc 00000000 	 .word l2
- 1061 01e0 00000000 	 .word pi
- 1062              	 .cfi_endproc
- 1063              	.LFE326:
- 1065              	 .section .text.update,"ax",%progbits
- 1066              	 .align 2
- 1067              	 .global update
- 1068              	 .thumb
- 1069              	 .thumb_func
- 1071              	update:
- 1072              	.LFB327:
-  42:../kinematics.h **** void update(struct Leg *n)
-  43:../kinematics.h **** {
- 1073              	 .loc 5 43 0
- 1074              	 .cfi_startproc
- 1075              	 
- 1076              	 
- 1077 0000 80B5     	 push {r7,lr}
- 1078              	.LCFI66:
- 1079              	 .cfi_def_cfa_offset 8
- 1080              	 .cfi_offset 7,-8
- 1081              	 .cfi_offset 14,-4
- 1082 0002 82B0     	 sub sp,sp,#8
- 1083              	.LCFI67:
- 1084              	 .cfi_def_cfa_offset 16
- 1085 0004 00AF     	 add r7,sp,#0
- 1086              	.LCFI68:
- 1087              	 .cfi_def_cfa_register 7
- 1088 0006 7860     	 str r0,[r7,#4]
-  44:../kinematics.h **** 	n->kat_abs_poprzedni[0] = n->kat_abs_rad[0];
- 1089              	 .loc 5 44 0
- 1090 0008 7B68     	 ldr r3,[r7,#4]
- 1091 000a 5A6D     	 ldr r2,[r3,#84]
- 1092 000c 7B68     	 ldr r3,[r7,#4]
- 1093 000e 5A61     	 str r2,[r3,#20]
-  45:../kinematics.h **** 	n->kat_abs_poprzedni[1] = n->kat_abs_rad[1];
- 1094              	 .loc 5 45 0
- 1095 0010 7B68     	 ldr r3,[r7,#4]
- 1096 0012 9A6D     	 ldr r2,[r3,#88]
- 1097 0014 7B68     	 ldr r3,[r7,#4]
- 1098 0016 9A61     	 str r2,[r3,#24]
-  46:../kinematics.h **** 	n->kat_abs_rad[0] = (float)n->kat_abs[0] * pi / 32767.0f;;
- 1099              	 .loc 5 46 0
- 1100 0018 7B68     	 ldr r3,[r7,#4]
- 1101 001a DB68     	 ldr r3,[r3,#12]
- 1102 001c 07EE903A 	 fmsr s15,r3
- 1103 0020 B8EEE77A 	 fsitos s14,s15
- 1104 0024 2E4B     	 ldr r3,.L28
- 1105 0026 D3ED007A 	 flds s15,[r3]
- 1106 002a 67EE277A 	 fmuls s15,s14,s15
- 1107 002e 9FED2D7A 	 flds s14,.L28+4
- 1108 0032 C7EE877A 	 fdivs s15,s15,s14
- 1109 0036 7B68     	 ldr r3,[r7,#4]
- 1110 0038 C3ED157A 	 fsts s15,[r3,#84]
-  47:../kinematics.h **** 	n->kat_abs_rad[1] = (float)n->kat_abs[1]  * pi / 32767.0f;;
- 1111              	 .loc 5 47 0
- 1112 003c 7B68     	 ldr r3,[r7,#4]
- 1113 003e 1B69     	 ldr r3,[r3,#16]
- 1114 0040 07EE903A 	 fmsr s15,r3
- 1115 0044 B8EEE77A 	 fsitos s14,s15
- 1116 0048 254B     	 ldr r3,.L28
- 1117 004a D3ED007A 	 flds s15,[r3]
- 1118 004e 67EE277A 	 fmuls s15,s14,s15
- 1119 0052 9FED247A 	 flds s14,.L28+4
- 1120 0056 C7EE877A 	 fdivs s15,s15,s14
- 1121 005a 7B68     	 ldr r3,[r7,#4]
- 1122 005c C3ED167A 	 fsts s15,[r3,#88]
-  48:../kinematics.h **** 	n->predkosc_silnika[0] =(n->predkosc_silnika[0] * 0.4f) + ((n->kat_abs_rad[0] - n->kat_abs_poprzed
- 1123              	 .loc 5 48 0
- 1124 0060 7B68     	 ldr r3,[r7,#4]
- 1125 0062 D3ED077A 	 flds s15,[r3,#28]
- 1126 0066 9FED207A 	 flds s14,.L28+8
- 1127 006a 27EE877A 	 fmuls s14,s15,s14
- 1128 006e 7B68     	 ldr r3,[r7,#4]
- 1129 0070 D3ED156A 	 flds s13,[r3,#84]
- 1130 0074 7B68     	 ldr r3,[r7,#4]
- 1131 0076 D3ED057A 	 flds s15,[r3,#20]
- 1132 007a 76EEE76A 	 fsubs s13,s13,s15
- 1133 007e 1B4B     	 ldr r3,.L28+12
- 1134 0080 D3ED007A 	 flds s15,[r3]
- 1135 0084 C6EEA77A 	 fdivs s15,s13,s15
- 1136 0088 DFED196A 	 flds s13,.L28+16
- 1137 008c 67EEA67A 	 fmuls s15,s15,s13
- 1138 0090 77EE277A 	 fadds s15,s14,s15
- 1139 0094 7B68     	 ldr r3,[r7,#4]
- 1140 0096 C3ED077A 	 fsts s15,[r3,#28]
-  49:../kinematics.h **** 	n->predkosc_silnika[1] =(n->predkosc_silnika[0] * 0.4f) + ((n->kat_abs_rad[1] - n->kat_abs_poprzed
- 1141              	 .loc 5 49 0
- 1142 009a 7B68     	 ldr r3,[r7,#4]
- 1143 009c D3ED077A 	 flds s15,[r3,#28]
- 1144 00a0 9FED117A 	 flds s14,.L28+8
- 1145 00a4 27EE877A 	 fmuls s14,s15,s14
- 1146 00a8 7B68     	 ldr r3,[r7,#4]
- 1147 00aa D3ED166A 	 flds s13,[r3,#88]
- 1148 00ae 7B68     	 ldr r3,[r7,#4]
- 1149 00b0 D3ED067A 	 flds s15,[r3,#24]
- 1150 00b4 76EEE76A 	 fsubs s13,s13,s15
- 1151 00b8 0C4B     	 ldr r3,.L28+12
- 1152 00ba D3ED007A 	 flds s15,[r3]
- 1153 00be C6EEA77A 	 fdivs s15,s13,s15
- 1154 00c2 DFED0B6A 	 flds s13,.L28+16
- 1155 00c6 67EEA67A 	 fmuls s15,s15,s13
- 1156 00ca 77EE277A 	 fadds s15,s14,s15
- 1157 00ce 7B68     	 ldr r3,[r7,#4]
- 1158 00d0 C3ED087A 	 fsts s15,[r3,#32]
-  50:../kinematics.h **** 	Ik(n);
- 1159              	 .loc 5 50 0
- 1160 00d4 7868     	 ldr r0,[r7,#4]
- 1161 00d6 FFF7FEFF 	 bl Ik
+   8:../kinematics.h **** void Ik(struct Leg *n);		//Inverse kinematics
+   9:../kinematics.h **** void Fk(struct Leg *n);	//Forward kinematics
+  10:../kinematics.h **** void Update(struct Leg *n);	//Update floating numbers from raw data from motor drivers
+  11:../kinematics.h **** void Spring(struct Leg *n);	//Virtual complience calculations
+  12:../kinematics.h **** 
+  13:../kinematics.h **** void Ik(struct Leg *n)
+  14:../kinematics.h **** {
+ 668              	 .loc 5 14 0
+ 669              	 .cfi_startproc
+ 670              	 
+ 671              	 
+ 672 0000 80B5     	 push {r7,lr}
+ 673              	.LCFI54:
+ 674              	 .cfi_def_cfa_offset 8
+ 675              	 .cfi_offset 7,-8
+ 676              	 .cfi_offset 14,-4
+ 677 0002 8AB0     	 sub sp,sp,#40
+ 678              	.LCFI55:
+ 679              	 .cfi_def_cfa_offset 48
+ 680 0004 00AF     	 add r7,sp,#0
+ 681              	.LCFI56:
+ 682              	 .cfi_def_cfa_register 7
+ 683 0006 7860     	 str r0,[r7,#4]
+  15:../kinematics.h **** 	float x = n->foot.x;
+ 684              	 .loc 5 15 0
+ 685 0008 7B68     	 ldr r3,[r7,#4]
+ 686 000a 5B6B     	 ldr r3,[r3,#52]
+ 687 000c 7B62     	 str r3,[r7,#36]
+  16:../kinematics.h **** 	float y = n->foot.y;
+ 688              	 .loc 5 16 0
+ 689 000e 7B68     	 ldr r3,[r7,#4]
+ 690 0010 9B6B     	 ldr r3,[r3,#56]
+ 691 0012 3B62     	 str r3,[r7,#32]
+  17:../kinematics.h **** 	float La = sqrtf(((d/2)-x)*((d/2)-x)+y*y);
+ 692              	 .loc 5 17 0
+ 693 0014 6E4B     	 ldr r3,.L22
+ 694 0016 D3ED007A 	 flds s15,[r3]
+ 695 001a B0EE007A 	 fconsts s14,#0
+ 696 001e 87EE877A 	 fdivs s14,s15,s14
+ 697 0022 D7ED097A 	 flds s15,[r7,#36]
+ 698 0026 37EE677A 	 fsubs s14,s14,s15
+ 699 002a 694B     	 ldr r3,.L22
+ 700 002c D3ED007A 	 flds s15,[r3]
+ 701 0030 F0EE006A 	 fconsts s13,#0
+ 702 0034 C7EEA66A 	 fdivs s13,s15,s13
+ 703 0038 D7ED097A 	 flds s15,[r7,#36]
+ 704 003c 76EEE77A 	 fsubs s15,s13,s15
+ 705 0040 27EE277A 	 fmuls s14,s14,s15
+ 706 0044 D7ED086A 	 flds s13,[r7,#32]
+ 707 0048 D7ED087A 	 flds s15,[r7,#32]
+ 708 004c 66EEA77A 	 fmuls s15,s13,s15
+ 709 0050 77EE277A 	 fadds s15,s14,s15
+ 710 0054 17EE900A 	 fmrs r0,s15
+ 711 0058 FFF7FEFF 	 bl sqrtf
+ 712 005c F861     	 str r0,[r7,#28]
+  18:../kinematics.h **** 	float Lb = sqrtf(((d/2)+x)*((d/2)+x)+y*y);
+ 713              	 .loc 5 18 0
+ 714 005e 5C4B     	 ldr r3,.L22
+ 715 0060 D3ED007A 	 flds s15,[r3]
+ 716 0064 B0EE007A 	 fconsts s14,#0
+ 717 0068 87EE877A 	 fdivs s14,s15,s14
+ 718 006c D7ED097A 	 flds s15,[r7,#36]
+ 719 0070 37EE277A 	 fadds s14,s14,s15
+ 720 0074 564B     	 ldr r3,.L22
+ 721 0076 D3ED007A 	 flds s15,[r3]
+ 722 007a F0EE006A 	 fconsts s13,#0
+ 723 007e C7EEA66A 	 fdivs s13,s15,s13
+ 724 0082 D7ED097A 	 flds s15,[r7,#36]
+ 725 0086 76EEA77A 	 fadds s15,s13,s15
+ 726 008a 27EE277A 	 fmuls s14,s14,s15
+ 727 008e D7ED086A 	 flds s13,[r7,#32]
+ 728 0092 D7ED087A 	 flds s15,[r7,#32]
+ 729 0096 66EEA77A 	 fmuls s15,s13,s15
+ 730 009a 77EE277A 	 fadds s15,s14,s15
+ 731 009e 17EE900A 	 fmrs r0,s15
+ 732 00a2 FFF7FEFF 	 bl sqrtf
+ 733 00a6 B861     	 str r0,[r7,#24]
+  19:../kinematics.h **** 	float fi1 = (l1*l1+La*La-l2*l2)/(2*l1*La);
+ 734              	 .loc 5 19 0
+ 735 00a8 4A4B     	 ldr r3,.L22+4
+ 736 00aa 93ED007A 	 flds s14,[r3]
+ 737 00ae 494B     	 ldr r3,.L22+4
+ 738 00b0 D3ED007A 	 flds s15,[r3]
+ 739 00b4 27EE277A 	 fmuls s14,s14,s15
+ 740 00b8 D7ED076A 	 flds s13,[r7,#28]
+ 741 00bc D7ED077A 	 flds s15,[r7,#28]
+ 742 00c0 66EEA77A 	 fmuls s15,s13,s15
+ 743 00c4 37EE277A 	 fadds s14,s14,s15
+ 744 00c8 434B     	 ldr r3,.L22+8
+ 745 00ca D3ED006A 	 flds s13,[r3]
+ 746 00ce 424B     	 ldr r3,.L22+8
+ 747 00d0 D3ED007A 	 flds s15,[r3]
+ 748 00d4 66EEA77A 	 fmuls s15,s13,s15
+ 749 00d8 37EE677A 	 fsubs s14,s14,s15
+ 750 00dc 3D4B     	 ldr r3,.L22+4
+ 751 00de D3ED007A 	 flds s15,[r3]
+ 752 00e2 77EEA76A 	 fadds s13,s15,s15
+ 753 00e6 D7ED077A 	 flds s15,[r7,#28]
+ 754 00ea 66EEA77A 	 fmuls s15,s13,s15
+ 755 00ee C7EE277A 	 fdivs s15,s14,s15
+ 756 00f2 C7ED057A 	 fsts s15,[r7,#20]
+  20:../kinematics.h **** 	fi1 = acosf(fi1);
+ 757              	 .loc 5 20 0
+ 758 00f6 7869     	 ldr r0,[r7,#20]
+ 759 00f8 FFF7FEFF 	 bl acosf
+ 760 00fc 7861     	 str r0,[r7,#20]
+  21:../kinematics.h **** 	float fi2 = (l1*l1+Lb*Lb-l2*l2)/(2*l1*Lb);
+ 761              	 .loc 5 21 0
+ 762 00fe 354B     	 ldr r3,.L22+4
+ 763 0100 93ED007A 	 flds s14,[r3]
+ 764 0104 334B     	 ldr r3,.L22+4
+ 765 0106 D3ED007A 	 flds s15,[r3]
+ 766 010a 27EE277A 	 fmuls s14,s14,s15
+ 767 010e D7ED066A 	 flds s13,[r7,#24]
+ 768 0112 D7ED067A 	 flds s15,[r7,#24]
+ 769 0116 66EEA77A 	 fmuls s15,s13,s15
+ 770 011a 37EE277A 	 fadds s14,s14,s15
+ 771 011e 2E4B     	 ldr r3,.L22+8
+ 772 0120 D3ED006A 	 flds s13,[r3]
+ 773 0124 2C4B     	 ldr r3,.L22+8
+ 774 0126 D3ED007A 	 flds s15,[r3]
+ 775 012a 66EEA77A 	 fmuls s15,s13,s15
+ 776 012e 37EE677A 	 fsubs s14,s14,s15
+ 777 0132 284B     	 ldr r3,.L22+4
+ 778 0134 D3ED007A 	 flds s15,[r3]
+ 779 0138 77EEA76A 	 fadds s13,s15,s15
+ 780 013c D7ED067A 	 flds s15,[r7,#24]
+ 781 0140 66EEA77A 	 fmuls s15,s13,s15
+ 782 0144 C7EE277A 	 fdivs s15,s14,s15
+ 783 0148 C7ED047A 	 fsts s15,[r7,#16]
+  22:../kinematics.h **** 	fi2 = acosf(fi2);
+ 784              	 .loc 5 22 0
+ 785 014c 3869     	 ldr r0,[r7,#16]
+ 786 014e FFF7FEFF 	 bl acosf
+ 787 0152 3861     	 str r0,[r7,#16]
+  23:../kinematics.h **** 	float psi1 = asinf(((d/2)-x)/La);
+ 788              	 .loc 5 23 0
+ 789 0154 1E4B     	 ldr r3,.L22
+ 790 0156 D3ED007A 	 flds s15,[r3]
+ 791 015a B0EE007A 	 fconsts s14,#0
+ 792 015e 87EE877A 	 fdivs s14,s15,s14
+ 793 0162 D7ED097A 	 flds s15,[r7,#36]
+ 794 0166 37EE677A 	 fsubs s14,s14,s15
+ 795 016a D7ED077A 	 flds s15,[r7,#28]
+ 796 016e C7EE277A 	 fdivs s15,s14,s15
+ 797 0172 17EE900A 	 fmrs r0,s15
+ 798 0176 FFF7FEFF 	 bl asinf
+ 799 017a F860     	 str r0,[r7,#12]
+  24:../kinematics.h **** 	float psi2 = asinf(((d/2)+x)/Lb);
+ 800              	 .loc 5 24 0
+ 801 017c 144B     	 ldr r3,.L22
+ 802 017e D3ED007A 	 flds s15,[r3]
+ 803 0182 B0EE007A 	 fconsts s14,#0
+ 804 0186 87EE877A 	 fdivs s14,s15,s14
+ 805 018a D7ED097A 	 flds s15,[r7,#36]
+ 806 018e 37EE277A 	 fadds s14,s14,s15
+ 807 0192 D7ED067A 	 flds s15,[r7,#24]
+ 808 0196 C7EE277A 	 fdivs s15,s14,s15
+ 809 019a 17EE900A 	 fmrs r0,s15
+ 810 019e FFF7FEFF 	 bl asinf
+ 811 01a2 B860     	 str r0,[r7,#8]
+  25:../kinematics.h **** 
+  26:../kinematics.h **** 	n->teta[0] = fi1 - psi1;
+ 812              	 .loc 5 26 0
+ 813 01a4 97ED057A 	 flds s14,[r7,#20]
+ 814 01a8 D7ED037A 	 flds s15,[r7,#12]
+ 815 01ac 77EE677A 	 fsubs s15,s14,s15
+ 816 01b0 7B68     	 ldr r3,[r7,#4]
+ 817 01b2 C3ED0F7A 	 fsts s15,[r3,#60]
+  27:../kinematics.h **** 	n->teta[1] = fi2 - psi2;
+ 818              	 .loc 5 27 0
+ 819 01b6 97ED047A 	 flds s14,[r7,#16]
+ 820 01ba D7ED027A 	 flds s15,[r7,#8]
+ 821 01be 77EE677A 	 fsubs s15,s14,s15
+ 822 01c2 7B68     	 ldr r3,[r7,#4]
+ 823 01c4 C3ED107A 	 fsts s15,[r3,#64]
+  28:../kinematics.h **** }
+ 824              	 .loc 5 28 0
+ 825 01c8 2837     	 adds r7,r7,#40
+ 826              	.LCFI57:
+ 827              	 .cfi_def_cfa_offset 8
+ 828 01ca BD46     	 mov sp,r7
+ 829              	.LCFI58:
+ 830              	 .cfi_def_cfa_register 13
+ 831              	 
+ 832 01cc 80BD     	 pop {r7,pc}
+ 833              	.L23:
+ 834 01ce 00BF     	 .align 2
+ 835              	.L22:
+ 836 01d0 00000000 	 .word d
+ 837 01d4 00000000 	 .word l1
+ 838 01d8 00000000 	 .word l2
+ 839              	 .cfi_endproc
+ 840              	.LFE325:
+ 842              	 .global __aeabi_f2d
+ 843              	 .global __aeabi_dmul
+ 844              	 .global __aeabi_dsub
+ 845              	 .global __aeabi_dadd
+ 846              	 .global __aeabi_d2f
+ 847              	 .section .text.Fk,"ax",%progbits
+ 848              	 .align 2
+ 849              	 .global Fk
+ 850              	 .thumb
+ 851              	 .thumb_func
+ 853              	Fk:
+ 854              	.LFB326:
+  29:../kinematics.h **** void Fk(struct Leg *n)
+  30:../kinematics.h **** {
+ 855              	 .loc 5 30 0
+ 856              	 .cfi_startproc
+ 857              	 
+ 858              	 
+ 859 0000 2DE9B043 	 push {r4,r5,r7,r8,r9,lr}
+ 860              	.LCFI59:
+ 861              	 .cfi_def_cfa_offset 24
+ 862              	 .cfi_offset 4,-24
+ 863              	 .cfi_offset 5,-20
+ 864              	 .cfi_offset 7,-16
+ 865              	 .cfi_offset 8,-12
+ 866              	 .cfi_offset 9,-8
+ 867              	 .cfi_offset 14,-4
+ 868 0004 2DED028B 	 fstmfdd sp!,{d8}
+ 869              	.LCFI60:
+ 870              	 .cfi_def_cfa_offset 32
+ 871              	 .cfi_offset 80,-32
+ 872              	 .cfi_offset 81,-28
+ 873 0008 8CB0     	 sub sp,sp,#48
+ 874              	.LCFI61:
+ 875              	 .cfi_def_cfa_offset 80
+ 876 000a 00AF     	 add r7,sp,#0
+ 877              	.LCFI62:
+ 878              	 .cfi_def_cfa_register 7
+ 879 000c 7860     	 str r0,[r7,#4]
+  31:../kinematics.h **** 	float a = d + l1*(sinf(n->teta[1]) + sinf(n->teta[0])) ;
+ 880              	 .loc 5 31 0
+ 881 000e 7B68     	 ldr r3,[r7,#4]
+ 882 0010 1B6C     	 ldr r3,[r3,#64]
+ 883 0012 1846     	 mov r0,r3
+ 884 0014 FFF7FEFF 	 bl sinf
+ 885 0018 08EE100A 	 fmsr s16,r0
+ 886 001c 7B68     	 ldr r3,[r7,#4]
+ 887 001e DB6B     	 ldr r3,[r3,#60]
+ 888 0020 1846     	 mov r0,r3
+ 889 0022 FFF7FEFF 	 bl sinf
+ 890 0026 07EE900A 	 fmsr s15,r0
+ 891 002a 38EE277A 	 fadds s14,s16,s15
+ 892 002e 694B     	 ldr r3,.L25
+ 893 0030 D3ED007A 	 flds s15,[r3]
+ 894 0034 27EE277A 	 fmuls s14,s14,s15
+ 895 0038 674B     	 ldr r3,.L25+4
+ 896 003a D3ED007A 	 flds s15,[r3]
+ 897 003e 77EE277A 	 fadds s15,s14,s15
+ 898 0042 C7ED0B7A 	 fsts s15,[r7,#44]
+  32:../kinematics.h **** 	float b = l1 * (cosf(n->teta[1]) - cosf(n->teta[0]));
+ 899              	 .loc 5 32 0
+ 900 0046 7B68     	 ldr r3,[r7,#4]
+ 901 0048 1B6C     	 ldr r3,[r3,#64]
+ 902 004a 1846     	 mov r0,r3
+ 903 004c FFF7FEFF 	 bl cosf
+ 904 0050 08EE100A 	 fmsr s16,r0
+ 905 0054 7B68     	 ldr r3,[r7,#4]
+ 906 0056 DB6B     	 ldr r3,[r3,#60]
+ 907 0058 1846     	 mov r0,r3
+ 908 005a FFF7FEFF 	 bl cosf
+ 909 005e 07EE900A 	 fmsr s15,r0
+ 910 0062 38EE677A 	 fsubs s14,s16,s15
+ 911 0066 5B4B     	 ldr r3,.L25
+ 912 0068 D3ED007A 	 flds s15,[r3]
+ 913 006c 67EE277A 	 fmuls s15,s14,s15
+ 914 0070 C7ED0A7A 	 fsts s15,[r7,#40]
+  33:../kinematics.h **** 	float p = sqrtf(a*a + b*b);
+ 915              	 .loc 5 33 0
+ 916 0074 97ED0B7A 	 flds s14,[r7,#44]
+ 917 0078 D7ED0B7A 	 flds s15,[r7,#44]
+ 918 007c 27EE277A 	 fmuls s14,s14,s15
+ 919 0080 D7ED0A6A 	 flds s13,[r7,#40]
+ 920 0084 D7ED0A7A 	 flds s15,[r7,#40]
+ 921 0088 66EEA77A 	 fmuls s15,s13,s15
+ 922 008c 77EE277A 	 fadds s15,s14,s15
+ 923 0090 17EE900A 	 fmrs r0,s15
+ 924 0094 FFF7FEFF 	 bl sqrtf
+ 925 0098 7862     	 str r0,[r7,#36]
+  34:../kinematics.h **** 	float fi = atan2f(b,a);
+ 926              	 .loc 5 34 0
+ 927 009a B86A     	 ldr r0,[r7,#40]
+ 928 009c F96A     	 ldr r1,[r7,#44]
+ 929 009e FFF7FEFF 	 bl atan2f
+ 930 00a2 3862     	 str r0,[r7,#32]
+  35:../kinematics.h **** 	float theta = asinf(p / 2*l2);
+ 931              	 .loc 5 35 0
+ 932 00a4 D7ED097A 	 flds s15,[r7,#36]
+ 933 00a8 B0EE007A 	 fconsts s14,#0
+ 934 00ac 87EE877A 	 fdivs s14,s15,s14
+ 935 00b0 4A4B     	 ldr r3,.L25+8
+ 936 00b2 D3ED007A 	 flds s15,[r3]
+ 937 00b6 67EE277A 	 fmuls s15,s14,s15
+ 938 00ba 17EE900A 	 fmrs r0,s15
+ 939 00be FFF7FEFF 	 bl asinf
+ 940 00c2 F861     	 str r0,[r7,#28]
+  36:../kinematics.h **** 	float gamma = pi / 2 - theta;
+ 941              	 .loc 5 36 0
+ 942 00c4 464B     	 ldr r3,.L25+12
+ 943 00c6 D3ED007A 	 flds s15,[r3]
+ 944 00ca B0EE007A 	 fconsts s14,#0
+ 945 00ce 87EE877A 	 fdivs s14,s15,s14
+ 946 00d2 D7ED077A 	 flds s15,[r7,#28]
+ 947 00d6 77EE677A 	 fsubs s15,s14,s15
+ 948 00da C7ED067A 	 fsts s15,[r7,#24]
+  37:../kinematics.h **** 	float psi = gamma + fi;
+ 949              	 .loc 5 37 0
+ 950 00de 97ED067A 	 flds s14,[r7,#24]
+ 951 00e2 D7ED087A 	 flds s15,[r7,#32]
+ 952 00e6 77EE277A 	 fadds s15,s14,s15
+ 953 00ea C7ED057A 	 fsts s15,[r7,#20]
+  38:../kinematics.h **** 	struct vec2 xy;
+  39:../kinematics.h **** 	xy.x = d/2 - l1*sin(n->teta[0]) + l2*cosf(psi);
+ 954              	 .loc 5 39 0
+ 955 00ee 3A4B     	 ldr r3,.L25+4
+ 956 00f0 D3ED007A 	 flds s15,[r3]
+ 957 00f4 B0EE007A 	 fconsts s14,#0
+ 958 00f8 C7EE877A 	 fdivs s15,s15,s14
+ 959 00fc 17EE900A 	 fmrs r0,s15
+ 960 0100 FFF7FEFF 	 bl __aeabi_f2d
+ 961 0104 0446     	 mov r4,r0
+ 962 0106 0D46     	 mov r5,r1
+ 963 0108 324B     	 ldr r3,.L25
+ 964 010a 1B68     	 ldr r3,[r3]
+ 965 010c 1846     	 mov r0,r3
+ 966 010e FFF7FEFF 	 bl __aeabi_f2d
+ 967 0112 8046     	 mov r8,r0
+ 968 0114 8946     	 mov r9,r1
+ 969 0116 7B68     	 ldr r3,[r7,#4]
+ 970 0118 DB6B     	 ldr r3,[r3,#60]
+ 971 011a 1846     	 mov r0,r3
+ 972 011c FFF7FEFF 	 bl __aeabi_f2d
+ 973 0120 0246     	 mov r2,r0
+ 974 0122 0B46     	 mov r3,r1
+ 975 0124 1046     	 mov r0,r2
+ 976 0126 1946     	 mov r1,r3
+ 977 0128 FFF7FEFF 	 bl sin
+ 978 012c 0246     	 mov r2,r0
+ 979 012e 0B46     	 mov r3,r1
+ 980 0130 4046     	 mov r0,r8
+ 981 0132 4946     	 mov r1,r9
+ 982 0134 FFF7FEFF 	 bl __aeabi_dmul
+ 983 0138 0246     	 mov r2,r0
+ 984 013a 0B46     	 mov r3,r1
+ 985 013c 2046     	 mov r0,r4
+ 986 013e 2946     	 mov r1,r5
+ 987 0140 FFF7FEFF 	 bl __aeabi_dsub
+ 988 0144 0246     	 mov r2,r0
+ 989 0146 0B46     	 mov r3,r1
+ 990 0148 1446     	 mov r4,r2
+ 991 014a 1D46     	 mov r5,r3
+ 992 014c 7869     	 ldr r0,[r7,#20]
+ 993 014e FFF7FEFF 	 bl cosf
+ 994 0152 07EE100A 	 fmsr s14,r0
+ 995 0156 214B     	 ldr r3,.L25+8
+ 996 0158 D3ED007A 	 flds s15,[r3]
+ 997 015c 67EE277A 	 fmuls s15,s14,s15
+ 998 0160 17EE900A 	 fmrs r0,s15
+ 999 0164 FFF7FEFF 	 bl __aeabi_f2d
+ 1000 0168 0246     	 mov r2,r0
+ 1001 016a 0B46     	 mov r3,r1
+ 1002 016c 2046     	 mov r0,r4
+ 1003 016e 2946     	 mov r1,r5
+ 1004 0170 FFF7FEFF 	 bl __aeabi_dadd
+ 1005 0174 0246     	 mov r2,r0
+ 1006 0176 0B46     	 mov r3,r1
+ 1007 0178 1046     	 mov r0,r2
+ 1008 017a 1946     	 mov r1,r3
+ 1009 017c FFF7FEFF 	 bl __aeabi_d2f
+ 1010 0180 0346     	 mov r3,r0
+ 1011 0182 FB60     	 str r3,[r7,#12]
+  40:../kinematics.h **** 	xy.y = l1*cosf(n->teta[0]) + l2* cosf(psi);
+ 1012              	 .loc 5 40 0
+ 1013 0184 7B68     	 ldr r3,[r7,#4]
+ 1014 0186 DB6B     	 ldr r3,[r3,#60]
+ 1015 0188 1846     	 mov r0,r3
+ 1016 018a FFF7FEFF 	 bl cosf
+ 1017 018e 07EE100A 	 fmsr s14,r0
+ 1018 0192 104B     	 ldr r3,.L25
+ 1019 0194 D3ED007A 	 flds s15,[r3]
+ 1020 0198 27EE278A 	 fmuls s16,s14,s15
+ 1021 019c 7869     	 ldr r0,[r7,#20]
+ 1022 019e FFF7FEFF 	 bl cosf
+ 1023 01a2 07EE100A 	 fmsr s14,r0
+ 1024 01a6 0D4B     	 ldr r3,.L25+8
+ 1025 01a8 D3ED007A 	 flds s15,[r3]
+ 1026 01ac 67EE277A 	 fmuls s15,s14,s15
+ 1027 01b0 78EE277A 	 fadds s15,s16,s15
+ 1028 01b4 C7ED047A 	 fsts s15,[r7,#16]
+  41:../kinematics.h **** 	n->foot = xy;
+ 1029              	 .loc 5 41 0
+ 1030 01b8 7B68     	 ldr r3,[r7,#4]
+ 1031 01ba 3433     	 adds r3,r3,#52
+ 1032 01bc 07F10C02 	 add r2,r7,#12
+ 1033 01c0 92E80300 	 ldmia r2,{r0,r1}
+ 1034 01c4 83E80300 	 stmia r3,{r0,r1}
+  42:../kinematics.h **** }
+ 1035              	 .loc 5 42 0
+ 1036 01c8 3037     	 adds r7,r7,#48
+ 1037              	.LCFI63:
+ 1038              	 .cfi_def_cfa_offset 32
+ 1039 01ca BD46     	 mov sp,r7
+ 1040              	.LCFI64:
+ 1041              	 .cfi_def_cfa_register 13
+ 1042              	 
+ 1043 01cc BDEC028B 	 fldmfdd sp!,{d8}
+ 1044              	.LCFI65:
+ 1045              	 .cfi_restore 80
+ 1046              	 .cfi_restore 81
+ 1047              	 .cfi_def_cfa_offset 24
+ 1048 01d0 BDE8B083 	 pop {r4,r5,r7,r8,r9,pc}
+ 1049              	.L26:
+ 1050              	 .align 2
+ 1051              	.L25:
+ 1052 01d4 00000000 	 .word l1
+ 1053 01d8 00000000 	 .word d
+ 1054 01dc 00000000 	 .word l2
+ 1055 01e0 00000000 	 .word pi
+ 1056              	 .cfi_endproc
+ 1057              	.LFE326:
+ 1059              	 .section .text.Update,"ax",%progbits
+ 1060              	 .align 2
+ 1061              	 .global Update
+ 1062              	 .thumb
+ 1063              	 .thumb_func
+ 1065              	Update:
+ 1066              	.LFB327:
+  43:../kinematics.h **** void Update(struct Leg *n)
+  44:../kinematics.h **** {
+ 1067              	 .loc 5 44 0
+ 1068              	 .cfi_startproc
+ 1069              	 
+ 1070              	 
+ 1071              	 
+ 1072 0000 80B4     	 push {r7}
+ 1073              	.LCFI66:
+ 1074              	 .cfi_def_cfa_offset 4
+ 1075              	 .cfi_offset 7,-4
+ 1076 0002 83B0     	 sub sp,sp,#12
+ 1077              	.LCFI67:
+ 1078              	 .cfi_def_cfa_offset 16
+ 1079 0004 00AF     	 add r7,sp,#0
+ 1080              	.LCFI68:
+ 1081              	 .cfi_def_cfa_register 7
+ 1082 0006 7860     	 str r0,[r7,#4]
+  45:../kinematics.h **** 	n->ang_abs_poprzedni[0] = n->ang_abs_rad[0];
+ 1083              	 .loc 5 45 0
+ 1084 0008 7B68     	 ldr r3,[r7,#4]
+ 1085 000a 5A6C     	 ldr r2,[r3,#68]
+ 1086 000c 7B68     	 ldr r3,[r7,#4]
+ 1087 000e 5A61     	 str r2,[r3,#20]
+  46:../kinematics.h **** 	n->ang_abs_poprzedni[1] = n->ang_abs_rad[1];
+ 1088              	 .loc 5 46 0
+ 1089 0010 7B68     	 ldr r3,[r7,#4]
+ 1090 0012 9A6C     	 ldr r2,[r3,#72]
+ 1091 0014 7B68     	 ldr r3,[r7,#4]
+ 1092 0016 9A61     	 str r2,[r3,#24]
+  47:../kinematics.h **** 	n->ang_abs_rad[0] = (float)n->ang_abs[0] * pi / 32767.0f;;
+ 1093              	 .loc 5 47 0
+ 1094 0018 7B68     	 ldr r3,[r7,#4]
+ 1095 001a DB68     	 ldr r3,[r3,#12]
+ 1096 001c 07EE903A 	 fmsr s15,r3
+ 1097 0020 B8EEE77A 	 fsitos s14,s15
+ 1098 0024 2E4B     	 ldr r3,.L28
+ 1099 0026 D3ED007A 	 flds s15,[r3]
+ 1100 002a 67EE277A 	 fmuls s15,s14,s15
+ 1101 002e 9FED2D7A 	 flds s14,.L28+4
+ 1102 0032 C7EE877A 	 fdivs s15,s15,s14
+ 1103 0036 7B68     	 ldr r3,[r7,#4]
+ 1104 0038 C3ED117A 	 fsts s15,[r3,#68]
+  48:../kinematics.h **** 	n->ang_abs_rad[1] = (float)n->ang_abs[1]  * pi / 32767.0f;;
+ 1105              	 .loc 5 48 0
+ 1106 003c 7B68     	 ldr r3,[r7,#4]
+ 1107 003e 1B69     	 ldr r3,[r3,#16]
+ 1108 0040 07EE903A 	 fmsr s15,r3
+ 1109 0044 B8EEE77A 	 fsitos s14,s15
+ 1110 0048 254B     	 ldr r3,.L28
+ 1111 004a D3ED007A 	 flds s15,[r3]
+ 1112 004e 67EE277A 	 fmuls s15,s14,s15
+ 1113 0052 9FED247A 	 flds s14,.L28+4
+ 1114 0056 C7EE877A 	 fdivs s15,s15,s14
+ 1115 005a 7B68     	 ldr r3,[r7,#4]
+ 1116 005c C3ED127A 	 fsts s15,[r3,#72]
+  49:../kinematics.h **** 	n->predkosc_silnika[0] =(n->predkosc_silnika[0] * 0.4f) + ((n->ang_abs_rad[0] - n->ang_abs_poprzed
+ 1117              	 .loc 5 49 0
+ 1118 0060 7B68     	 ldr r3,[r7,#4]
+ 1119 0062 D3ED077A 	 flds s15,[r3,#28]
+ 1120 0066 9FED207A 	 flds s14,.L28+8
+ 1121 006a 27EE877A 	 fmuls s14,s15,s14
+ 1122 006e 7B68     	 ldr r3,[r7,#4]
+ 1123 0070 D3ED116A 	 flds s13,[r3,#68]
+ 1124 0074 7B68     	 ldr r3,[r7,#4]
+ 1125 0076 D3ED057A 	 flds s15,[r3,#20]
+ 1126 007a 76EEE76A 	 fsubs s13,s13,s15
+ 1127 007e 1B4B     	 ldr r3,.L28+12
+ 1128 0080 D3ED007A 	 flds s15,[r3]
+ 1129 0084 C6EEA77A 	 fdivs s15,s13,s15
+ 1130 0088 DFED196A 	 flds s13,.L28+16
+ 1131 008c 67EEA67A 	 fmuls s15,s15,s13
+ 1132 0090 77EE277A 	 fadds s15,s14,s15
+ 1133 0094 7B68     	 ldr r3,[r7,#4]
+ 1134 0096 C3ED077A 	 fsts s15,[r3,#28]
+  50:../kinematics.h **** 	n->predkosc_silnika[1] =(n->predkosc_silnika[0] * 0.4f) + ((n->ang_abs_rad[1] - n->ang_abs_poprzed
+ 1135              	 .loc 5 50 0
+ 1136 009a 7B68     	 ldr r3,[r7,#4]
+ 1137 009c D3ED077A 	 flds s15,[r3,#28]
+ 1138 00a0 9FED117A 	 flds s14,.L28+8
+ 1139 00a4 27EE877A 	 fmuls s14,s15,s14
+ 1140 00a8 7B68     	 ldr r3,[r7,#4]
+ 1141 00aa D3ED126A 	 flds s13,[r3,#72]
+ 1142 00ae 7B68     	 ldr r3,[r7,#4]
+ 1143 00b0 D3ED067A 	 flds s15,[r3,#24]
+ 1144 00b4 76EEE76A 	 fsubs s13,s13,s15
+ 1145 00b8 0C4B     	 ldr r3,.L28+12
+ 1146 00ba D3ED007A 	 flds s15,[r3]
+ 1147 00be C6EEA77A 	 fdivs s15,s13,s15
+ 1148 00c2 DFED0B6A 	 flds s13,.L28+16
+ 1149 00c6 67EEA67A 	 fmuls s15,s15,s13
+ 1150 00ca 77EE277A 	 fadds s15,s14,s15
+ 1151 00ce 7B68     	 ldr r3,[r7,#4]
+ 1152 00d0 C3ED087A 	 fsts s15,[r3,#32]
   51:../kinematics.h **** }
- 1162              	 .loc 5 51 0
- 1163 00da 0837     	 adds r7,r7,#8
- 1164              	.LCFI69:
- 1165              	 .cfi_def_cfa_offset 8
- 1166 00dc BD46     	 mov sp,r7
- 1167              	.LCFI70:
- 1168              	 .cfi_def_cfa_register 13
- 1169              	 
- 1170 00de 80BD     	 pop {r7,pc}
- 1171              	.L29:
- 1172              	 .align 2
- 1173              	.L28:
- 1174 00e0 00000000 	 .word pi
- 1175 00e4 00FEFF46 	 .word 1191181824
- 1176 00e8 CDCCCC3E 	 .word 1053609165
- 1177 00ec 00000000 	 .word dt
- 1178 00f0 9A99193F 	 .word 1058642330
- 1179              	 .cfi_endproc
- 1180              	.LFE327:
- 1182              	 .section .text.Spring,"ax",%progbits
- 1183              	 .align 2
- 1184              	 .global Spring
- 1185              	 .thumb
- 1186              	 .thumb_func
- 1188              	Spring:
- 1189              	.LFB328:
+ 1153              	 .loc 5 51 0
+ 1154 00d4 0C37     	 adds r7,r7,#12
+ 1155              	.LCFI69:
+ 1156              	 .cfi_def_cfa_offset 4
+ 1157 00d6 BD46     	 mov sp,r7
+ 1158              	.LCFI70:
+ 1159              	 .cfi_def_cfa_register 13
+ 1160              	 
+ 1161 00d8 5DF8047B 	 ldr r7,[sp],#4
+ 1162              	.LCFI71:
+ 1163              	 .cfi_restore 7
+ 1164              	 .cfi_def_cfa_offset 0
+ 1165 00dc 7047     	 bx lr
+ 1166              	.L29:
+ 1167 00de 00BF     	 .align 2
+ 1168              	.L28:
+ 1169 00e0 00000000 	 .word pi
+ 1170 00e4 00FEFF46 	 .word 1191181824
+ 1171 00e8 CDCCCC3E 	 .word 1053609165
+ 1172 00ec 00000000 	 .word dt
+ 1173 00f0 9A99193F 	 .word 1058642330
+ 1174              	 .cfi_endproc
+ 1175              	.LFE327:
+ 1177              	 .section .text.Spring,"ax",%progbits
+ 1178              	 .align 2
+ 1179              	 .global Spring
+ 1180              	 .thumb
+ 1181              	 .thumb_func
+ 1183              	Spring:
+ 1184              	.LFB328:
   52:../kinematics.h **** void Spring(struct Leg *n)
   53:../kinematics.h **** {
- 1190              	 .loc 5 53 0
- 1191              	 .cfi_startproc
- 1192              	 
- 1193              	 
- 1194              	 
- 1195 0000 80B4     	 push {r7}
- 1196              	.LCFI71:
- 1197              	 .cfi_def_cfa_offset 4
- 1198              	 .cfi_offset 7,-4
- 1199 0002 83B0     	 sub sp,sp,#12
- 1200              	.LCFI72:
- 1201              	 .cfi_def_cfa_offset 16
- 1202 0004 00AF     	 add r7,sp,#0
- 1203              	.LCFI73:
- 1204              	 .cfi_def_cfa_register 7
- 1205 0006 7860     	 str r0,[r7,#4]
+ 1185              	 .loc 5 53 0
+ 1186              	 .cfi_startproc
+ 1187              	 
+ 1188              	 
+ 1189              	 
+ 1190 0000 80B4     	 push {r7}
+ 1191              	.LCFI72:
+ 1192              	 .cfi_def_cfa_offset 4
+ 1193              	 .cfi_offset 7,-4
+ 1194 0002 83B0     	 sub sp,sp,#12
+ 1195              	.LCFI73:
+ 1196              	 .cfi_def_cfa_offset 16
+ 1197 0004 00AF     	 add r7,sp,#0
+ 1198              	.LCFI74:
+ 1199              	 .cfi_def_cfa_register 7
+ 1200 0006 7860     	 str r0,[r7,#4]
   54:../kinematics.h **** 	n->poz_zad[0] = n->teta[0] * INT16_MAX / pi;
- 1206              	 .loc 5 54 0
- 1207 0008 7B68     	 ldr r3,[r7,#4]
- 1208 000a D3ED117A 	 flds s15,[r3,#68]
- 1209 000e 9FED157A 	 flds s14,.L31
- 1210 0012 27EE877A 	 fmuls s14,s15,s14
- 1211 0016 144B     	 ldr r3,.L31+4
- 1212 0018 D3ED007A 	 flds s15,[r3]
- 1213 001c C7EE277A 	 fdivs s15,s14,s15
- 1214 0020 FDEEE77A 	 ftosizs s15,s15
- 1215 0024 C7ED007A 	 fsts s15,[r7]
- 1216 0028 3B88     	 ldrh r3,[r7]
- 1217 002a 9AB2     	 uxth r2,r3
- 1218 002c 7B68     	 ldr r3,[r7,#4]
- 1219 002e 1A87     	 strh r2,[r3,#56]
+ 1201              	 .loc 5 54 0
+ 1202 0008 7B68     	 ldr r3,[r7,#4]
+ 1203 000a D3ED0F7A 	 flds s15,[r3,#60]
+ 1204 000e 9FED157A 	 flds s14,.L31
+ 1205 0012 27EE877A 	 fmuls s14,s15,s14
+ 1206 0016 144B     	 ldr r3,.L31+4
+ 1207 0018 D3ED007A 	 flds s15,[r3]
+ 1208 001c C7EE277A 	 fdivs s15,s14,s15
+ 1209 0020 FDEEE77A 	 ftosizs s15,s15
+ 1210 0024 C7ED007A 	 fsts s15,[r7]
+ 1211 0028 3B88     	 ldrh r3,[r7]
+ 1212 002a 9AB2     	 uxth r2,r3
+ 1213 002c 7B68     	 ldr r3,[r7,#4]
+ 1214 002e 1A86     	 strh r2,[r3,#48]
   55:../kinematics.h **** 	n->poz_zad[1] = n->teta[1] * INT16_MAX / pi;
- 1220              	 .loc 5 55 0
- 1221 0030 7B68     	 ldr r3,[r7,#4]
- 1222 0032 D3ED127A 	 flds s15,[r3,#72]
- 1223 0036 9FED0B7A 	 flds s14,.L31
- 1224 003a 27EE877A 	 fmuls s14,s15,s14
- 1225 003e 0A4B     	 ldr r3,.L31+4
- 1226 0040 D3ED007A 	 flds s15,[r3]
- 1227 0044 C7EE277A 	 fdivs s15,s14,s15
- 1228 0048 FDEEE77A 	 ftosizs s15,s15
- 1229 004c C7ED007A 	 fsts s15,[r7]
- 1230 0050 3B88     	 ldrh r3,[r7]
- 1231 0052 9AB2     	 uxth r2,r3
- 1232 0054 7B68     	 ldr r3,[r7,#4]
- 1233 0056 5A87     	 strh r2,[r3,#58]
+ 1215              	 .loc 5 55 0
+ 1216 0030 7B68     	 ldr r3,[r7,#4]
+ 1217 0032 D3ED107A 	 flds s15,[r3,#64]
+ 1218 0036 9FED0B7A 	 flds s14,.L31
+ 1219 003a 27EE877A 	 fmuls s14,s15,s14
+ 1220 003e 0A4B     	 ldr r3,.L31+4
+ 1221 0040 D3ED007A 	 flds s15,[r3]
+ 1222 0044 C7EE277A 	 fdivs s15,s14,s15
+ 1223 0048 FDEEE77A 	 ftosizs s15,s15
+ 1224 004c C7ED007A 	 fsts s15,[r7]
+ 1225 0050 3B88     	 ldrh r3,[r7]
+ 1226 0052 9AB2     	 uxth r2,r3
+ 1227 0054 7B68     	 ldr r3,[r7,#4]
+ 1228 0056 5A86     	 strh r2,[r3,#50]
   56:../kinematics.h **** }
- 1234              	 .loc 5 56 0
- 1235 0058 0C37     	 adds r7,r7,#12
- 1236              	.LCFI74:
- 1237              	 .cfi_def_cfa_offset 4
- 1238 005a BD46     	 mov sp,r7
- 1239              	.LCFI75:
- 1240              	 .cfi_def_cfa_register 13
- 1241              	 
- 1242 005c 5DF8047B 	 ldr r7,[sp],#4
- 1243              	.LCFI76:
- 1244              	 .cfi_restore 7
- 1245              	 .cfi_def_cfa_offset 0
- 1246 0060 7047     	 bx lr
- 1247              	.L32:
- 1248 0062 00BF     	 .align 2
- 1249              	.L31:
- 1250 0064 00FEFF46 	 .word 1191181824
- 1251 0068 00000000 	 .word pi
- 1252              	 .cfi_endproc
- 1253              	.LFE328:
- 1255              	 .section .text.XMC_Init,"ax",%progbits
- 1256              	 .align 2
- 1257              	 .global XMC_Init
- 1258              	 .thumb
- 1259              	 .thumb_func
- 1261              	XMC_Init:
- 1262              	.LFB329:
- 1263              	 .file 6 "../communications.h"
+ 1229              	 .loc 5 56 0
+ 1230 0058 0C37     	 adds r7,r7,#12
+ 1231              	.LCFI75:
+ 1232              	 .cfi_def_cfa_offset 4
+ 1233 005a BD46     	 mov sp,r7
+ 1234              	.LCFI76:
+ 1235              	 .cfi_def_cfa_register 13
+ 1236              	 
+ 1237 005c 5DF8047B 	 ldr r7,[sp],#4
+ 1238              	.LCFI77:
+ 1239              	 .cfi_restore 7
+ 1240              	 .cfi_def_cfa_offset 0
+ 1241 0060 7047     	 bx lr
+ 1242              	.L32:
+ 1243 0062 00BF     	 .align 2
+ 1244              	.L31:
+ 1245 0064 00FEFF46 	 .word 1191181824
+ 1246 0068 00000000 	 .word pi
+ 1247              	 .cfi_endproc
+ 1248              	.LFE328:
+ 1250              	 .section .text.XMC_Init,"ax",%progbits
+ 1251              	 .align 2
+ 1252              	 .global XMC_Init
+ 1253              	 .thumb
+ 1254              	 .thumb_func
+ 1256              	XMC_Init:
+ 1257              	.LFB329:
+ 1258              	 .file 6 "../communications.h"
    1:../communications.h **** /*
    2:../communications.h ****  * communications.h
    3:../communications.h ****  *
@@ -4174,689 +4162,719 @@
    5:../communications.h ****  *      Author: Mafish
    6:../communications.h ****  */
    7:../communications.h **** 
-   8:../communications.h **** int XMC_Init();
-   9:../communications.h **** void XMC_Check();
-  10:../communications.h **** void eorx();
-  11:../communications.h **** void Message_interpreter();
-  12:../communications.h **** void Send(uint8_t);
-  13:../communications.h **** void Send_Leg(struct Leg *n);
+   8:../communications.h **** uint8_t  XMC_Init(uint8_t);					//initialize driver (n). n=10 for all drivers
+   9:../communications.h **** void XMC_Check();						//check state all drivers
+  10:../communications.h **** void eorx();									//end of receive interrupt
+  11:../communications.h **** void Message_interpreter();		//read last message
+  12:../communications.h **** void Send(uint8_t);						// Send (n) bytes of data via half-duplex uart
+  13:../communications.h **** void Send_Leg(struct Leg *n);	//Send regular command string to both of legs drivers
   14:../communications.h **** 
-  15:../communications.h **** int XMC_Init()
+  15:../communications.h **** uint8_t  XMC_Init(uint8_t n)
   16:../communications.h **** {
- 1264              	 .loc 6 16 0
- 1265              	 .cfi_startproc
- 1266              	 
- 1267              	 
- 1268 0000 80B5     	 push {r7,lr}
- 1269              	.LCFI77:
- 1270              	 .cfi_def_cfa_offset 8
- 1271              	 .cfi_offset 7,-8
- 1272              	 .cfi_offset 14,-4
- 1273 0002 82B0     	 sub sp,sp,#8
- 1274              	.LCFI78:
- 1275              	 .cfi_def_cfa_offset 16
- 1276 0004 00AF     	 add r7,sp,#0
- 1277              	.LCFI79:
- 1278              	 .cfi_def_cfa_register 7
-  17:../communications.h **** 	init = 1;
- 1279              	 .loc 6 17 0
- 1280 0006 114B     	 ldr r3,.L37
- 1281 0008 0122     	 movs r2,#1
- 1282 000a 1A70     	 strb r2,[r3]
- 1283              	.LBB3:
-  18:../communications.h **** 	for(uint8_t i = 0; i < 8; i++)
- 1284              	 .loc 6 18 0
- 1285 000c 0023     	 movs r3,#0
- 1286 000e FB71     	 strb r3,[r7,#7]
- 1287 0010 14E0     	 b .L34
- 1288              	.L35:
-  19:../communications.h **** 	{
-  20:../communications.h **** 		txData[1] = 0x10 + i;
- 1289              	 .loc 6 20 0 discriminator 3
- 1290 0012 FB79     	 ldrb r3,[r7,#7]
- 1291 0014 1033     	 adds r3,r3,#16
- 1292 0016 DAB2     	 uxtb r2,r3
- 1293 0018 0D4B     	 ldr r3,.L37+4
- 1294 001a 5A70     	 strb r2,[r3,#1]
-  21:../communications.h **** 		txData[2] = 0xA1;
- 1295              	 .loc 6 21 0 discriminator 3
- 1296 001c 0C4B     	 ldr r3,.L37+4
- 1297 001e A122     	 movs r2,#161
- 1298 0020 9A70     	 strb r2,[r3,#2]
-  22:../communications.h **** 		txData[3] = EOF;
- 1299              	 .loc 6 22 0 discriminator 3
- 1300 0022 0B4B     	 ldr r3,.L37+4
- 1301 0024 DD22     	 movs r2,#221
- 1302 0026 DA70     	 strb r2,[r3,#3]
-  23:../communications.h **** 		Send(4);
- 1303              	 .loc 6 23 0 discriminator 3
- 1304 0028 0420     	 movs r0,#4
- 1305 002a FFF7FEFF 	 bl Send
-  24:../communications.h **** 		delay(300);
- 1306              	 .loc 6 24 0 discriminator 3
- 1307 002e 4FF49670 	 mov r0,#300
- 1308 0032 FFF7FEFF 	 bl delay
-  18:../communications.h **** 	{
- 1309              	 .loc 6 18 0 discriminator 3
- 1310 0036 FB79     	 ldrb r3,[r7,#7]
- 1311 0038 0133     	 adds r3,r3,#1
- 1312 003a FB71     	 strb r3,[r7,#7]
- 1313              	.L34:
-  18:../communications.h **** 	{
- 1314              	 .loc 6 18 0 is_stmt 0 discriminator 1
- 1315 003c FB79     	 ldrb r3,[r7,#7]
- 1316 003e 072B     	 cmp r3,#7
- 1317 0040 E7D9     	 bls .L35
- 1318              	.LBE3:
-  25:../communications.h **** 	}
-  26:../communications.h **** 	return 0;
- 1319              	 .loc 6 26 0 is_stmt 1
- 1320 0042 0023     	 movs r3,#0
-  27:../communications.h **** }
- 1321              	 .loc 6 27 0
- 1322 0044 1846     	 mov r0,r3
- 1323 0046 0837     	 adds r7,r7,#8
- 1324              	.LCFI80:
- 1325              	 .cfi_def_cfa_offset 8
- 1326 0048 BD46     	 mov sp,r7
- 1327              	.LCFI81:
- 1328              	 .cfi_def_cfa_register 13
- 1329              	 
- 1330 004a 80BD     	 pop {r7,pc}
- 1331              	.L38:
- 1332              	 .align 2
- 1333              	.L37:
- 1334 004c 00000000 	 .word init
- 1335 0050 00000000 	 .word txData
- 1336              	 .cfi_endproc
- 1337              	.LFE329:
- 1339              	 .section .text.XMC_Check,"ax",%progbits
- 1340              	 .align 2
- 1341              	 .global XMC_Check
- 1342              	 .thumb
- 1343              	 .thumb_func
- 1345              	XMC_Check:
- 1346              	.LFB330:
-  28:../communications.h **** void XMC_Check()
-  29:../communications.h **** {
- 1347              	 .loc 6 29 0
- 1348              	 .cfi_startproc
+ 1259              	 .loc 6 16 0
+ 1260              	 .cfi_startproc
+ 1261              	 
+ 1262              	 
+ 1263 0000 80B5     	 push {r7,lr}
+ 1264              	.LCFI78:
+ 1265              	 .cfi_def_cfa_offset 8
+ 1266              	 .cfi_offset 7,-8
+ 1267              	 .cfi_offset 14,-4
+ 1268 0002 84B0     	 sub sp,sp,#16
+ 1269              	.LCFI79:
+ 1270              	 .cfi_def_cfa_offset 24
+ 1271 0004 00AF     	 add r7,sp,#0
+ 1272              	.LCFI80:
+ 1273              	 .cfi_def_cfa_register 7
+ 1274 0006 0346     	 mov r3,r0
+ 1275 0008 FB71     	 strb r3,[r7,#7]
+  17:../communications.h **** 	if(n == 10)							//if n = 10 then init all drivers
+ 1276              	 .loc 6 17 0
+ 1277 000a FB79     	 ldrb r3,[r7,#7]
+ 1278 000c 0A2B     	 cmp r3,#10
+ 1279 000e 1BD1     	 bne .L34
+ 1280              	.LBB3:
+  18:../communications.h **** 		for(uint8_t i = 0; i < 8; i++)
+ 1281              	 .loc 6 18 0
+ 1282 0010 0023     	 movs r3,#0
+ 1283 0012 FB73     	 strb r3,[r7,#15]
+ 1284 0014 14E0     	 b .L35
+ 1285              	.L36:
+  19:../communications.h **** 		{
+  20:../communications.h **** 			txData[1] = 0x10 + i;
+ 1286              	 .loc 6 20 0 discriminator 3
+ 1287 0016 FB7B     	 ldrb r3,[r7,#15]
+ 1288 0018 1033     	 adds r3,r3,#16
+ 1289 001a DAB2     	 uxtb r2,r3
+ 1290 001c 164B     	 ldr r3,.L39
+ 1291 001e 5A70     	 strb r2,[r3,#1]
+  21:../communications.h **** 			txData[2] = 0xA1;
+ 1292              	 .loc 6 21 0 discriminator 3
+ 1293 0020 154B     	 ldr r3,.L39
+ 1294 0022 A122     	 movs r2,#161
+ 1295 0024 9A70     	 strb r2,[r3,#2]
+  22:../communications.h **** 			txData[3] = EOF;
+ 1296              	 .loc 6 22 0 discriminator 3
+ 1297 0026 144B     	 ldr r3,.L39
+ 1298 0028 DD22     	 movs r2,#221
+ 1299 002a DA70     	 strb r2,[r3,#3]
+  23:../communications.h **** 			Send(4);
+ 1300              	 .loc 6 23 0 discriminator 3
+ 1301 002c 0420     	 movs r0,#4
+ 1302 002e FFF7FEFF 	 bl Send
+  24:../communications.h **** 			delay(300);
+ 1303              	 .loc 6 24 0 discriminator 3
+ 1304 0032 4FF49670 	 mov r0,#300
+ 1305 0036 FFF7FEFF 	 bl delay
+  18:../communications.h **** 		{
+ 1306              	 .loc 6 18 0 discriminator 3
+ 1307 003a FB7B     	 ldrb r3,[r7,#15]
+ 1308 003c 0133     	 adds r3,r3,#1
+ 1309 003e FB73     	 strb r3,[r7,#15]
+ 1310              	.L35:
+  18:../communications.h **** 		{
+ 1311              	 .loc 6 18 0 is_stmt 0 discriminator 1
+ 1312 0040 FB7B     	 ldrb r3,[r7,#15]
+ 1313 0042 072B     	 cmp r3,#7
+ 1314 0044 E7D9     	 bls .L36
+ 1315              	.LBE3:
+ 1316 0046 04E0     	 b .L37
+ 1317              	.L34:
+  25:../communications.h **** 		}
+  26:../communications.h **** 	else										//init single driver (n)
+  27:../communications.h **** 		txData[1] = 0x10 + n;
+ 1318              	 .loc 6 27 0 is_stmt 1
+ 1319 0048 FB79     	 ldrb r3,[r7,#7]
+ 1320 004a 1033     	 adds r3,r3,#16
+ 1321 004c DAB2     	 uxtb r2,r3
+ 1322 004e 0A4B     	 ldr r3,.L39
+ 1323 0050 5A70     	 strb r2,[r3,#1]
+ 1324              	.L37:
+  28:../communications.h **** 		txData[2] = 0xA1;
+ 1325              	 .loc 6 28 0
+ 1326 0052 094B     	 ldr r3,.L39
+ 1327 0054 A122     	 movs r2,#161
+ 1328 0056 9A70     	 strb r2,[r3,#2]
+  29:../communications.h **** 		txData[3] = EOF;
+ 1329              	 .loc 6 29 0
+ 1330 0058 074B     	 ldr r3,.L39
+ 1331 005a DD22     	 movs r2,#221
+ 1332 005c DA70     	 strb r2,[r3,#3]
+  30:../communications.h **** 		Send(4);
+ 1333              	 .loc 6 30 0
+ 1334 005e 0420     	 movs r0,#4
+ 1335 0060 FFF7FEFF 	 bl Send
+  31:../communications.h **** 		delay(300);
+ 1336              	 .loc 6 31 0
+ 1337 0064 4FF49670 	 mov r0,#300
+ 1338 0068 FFF7FEFF 	 bl delay
+  32:../communications.h **** 
+  33:../communications.h **** 	return 0;
+ 1339              	 .loc 6 33 0
+ 1340 006c 0023     	 movs r3,#0
+  34:../communications.h **** }
+ 1341              	 .loc 6 34 0
+ 1342 006e 1846     	 mov r0,r3
+ 1343 0070 1037     	 adds r7,r7,#16
+ 1344              	.LCFI81:
+ 1345              	 .cfi_def_cfa_offset 8
+ 1346 0072 BD46     	 mov sp,r7
+ 1347              	.LCFI82:
+ 1348              	 .cfi_def_cfa_register 13
  1349              	 
- 1350              	 
- 1351 0000 80B5     	 push {r7,lr}
- 1352              	.LCFI82:
- 1353              	 .cfi_def_cfa_offset 8
- 1354              	 .cfi_offset 7,-8
- 1355              	 .cfi_offset 14,-4
- 1356 0002 82B0     	 sub sp,sp,#8
- 1357              	.LCFI83:
- 1358              	 .cfi_def_cfa_offset 16
- 1359 0004 00AF     	 add r7,sp,#0
- 1360              	.LCFI84:
- 1361              	 .cfi_def_cfa_register 7
- 1362              	.LBB4:
-  30:../communications.h **** 	for(uint8_t i = 0; i < 8; i++)
- 1363              	 .loc 6 30 0
- 1364 0006 0023     	 movs r3,#0
- 1365 0008 FB71     	 strb r3,[r7,#7]
- 1366 000a 1AE0     	 b .L40
- 1367              	.L41:
-  31:../communications.h **** 	{
-  32:../communications.h **** 		DIGITAL_IO_SetOutputHigh(&LED1);
- 1368              	 .loc 6 32 0 discriminator 3
- 1369 000c 1048     	 ldr r0,.L42
- 1370 000e FFF7FEFF 	 bl DIGITAL_IO_SetOutputHigh
-  33:../communications.h **** 		txData[1] = 0x10 + i;
- 1371              	 .loc 6 33 0 discriminator 3
- 1372 0012 FB79     	 ldrb r3,[r7,#7]
- 1373 0014 1033     	 adds r3,r3,#16
- 1374 0016 DAB2     	 uxtb r2,r3
- 1375 0018 0E4B     	 ldr r3,.L42+4
- 1376 001a 5A70     	 strb r2,[r3,#1]
-  34:../communications.h **** 		txData[2] = 0xA3;
- 1377              	 .loc 6 34 0 discriminator 3
- 1378 001c 0D4B     	 ldr r3,.L42+4
- 1379 001e A322     	 movs r2,#163
- 1380 0020 9A70     	 strb r2,[r3,#2]
-  35:../communications.h **** 		txData[3] = EOF;
- 1381              	 .loc 6 35 0 discriminator 3
- 1382 0022 0C4B     	 ldr r3,.L42+4
- 1383 0024 DD22     	 movs r2,#221
- 1384 0026 DA70     	 strb r2,[r3,#3]
-  36:../communications.h **** 		Send(4);
- 1385              	 .loc 6 36 0 discriminator 3
- 1386 0028 0420     	 movs r0,#4
- 1387 002a FFF7FEFF 	 bl Send
-  37:../communications.h **** 		delay(300);
- 1388              	 .loc 6 37 0 discriminator 3
- 1389 002e 4FF49670 	 mov r0,#300
- 1390 0032 FFF7FEFF 	 bl delay
-  38:../communications.h **** 		DIGITAL_IO_SetOutputLow((&LED1));
- 1391              	 .loc 6 38 0 discriminator 3
- 1392 0036 0648     	 ldr r0,.L42
- 1393 0038 FFF7FEFF 	 bl DIGITAL_IO_SetOutputLow
-  30:../communications.h **** 	{
- 1394              	 .loc 6 30 0 discriminator 3
- 1395 003c FB79     	 ldrb r3,[r7,#7]
- 1396 003e 0133     	 adds r3,r3,#1
- 1397 0040 FB71     	 strb r3,[r7,#7]
- 1398              	.L40:
-  30:../communications.h **** 	{
- 1399              	 .loc 6 30 0 is_stmt 0 discriminator 1
- 1400 0042 FB79     	 ldrb r3,[r7,#7]
- 1401 0044 072B     	 cmp r3,#7
- 1402 0046 E1D9     	 bls .L41
- 1403              	.LBE4:
-  39:../communications.h **** 	}
-  40:../communications.h **** }
- 1404              	 .loc 6 40 0 is_stmt 1
- 1405 0048 0837     	 adds r7,r7,#8
- 1406              	.LCFI85:
- 1407              	 .cfi_def_cfa_offset 8
- 1408 004a BD46     	 mov sp,r7
- 1409              	.LCFI86:
- 1410              	 .cfi_def_cfa_register 13
- 1411              	 
- 1412 004c 80BD     	 pop {r7,pc}
- 1413              	.L43:
- 1414 004e 00BF     	 .align 2
- 1415              	.L42:
- 1416 0050 00000000 	 .word LED1
- 1417 0054 00000000 	 .word txData
- 1418              	 .cfi_endproc
- 1419              	.LFE330:
- 1421              	 .section .text.eorx,"ax",%progbits
- 1422              	 .align 2
- 1423              	 .global eorx
- 1424              	 .thumb
- 1425              	 .thumb_func
- 1427              	eorx:
- 1428              	.LFB331:
-  41:../communications.h **** void eorx()
-  42:../communications.h **** {
- 1429              	 .loc 6 42 0
- 1430              	 .cfi_startproc
- 1431              	 
- 1432              	 
- 1433 0000 80B5     	 push {r7,lr}
- 1434              	.LCFI87:
- 1435              	 .cfi_def_cfa_offset 8
- 1436              	 .cfi_offset 7,-8
- 1437              	 .cfi_offset 14,-4
- 1438 0002 00AF     	 add r7,sp,#0
- 1439              	.LCFI88:
- 1440              	 .cfi_def_cfa_register 7
-  43:../communications.h **** 
-  44:../communications.h **** 	if(rxByte == SOF)
- 1441              	 .loc 6 44 0
- 1442 0004 1A4B     	 ldr r3,.L48
- 1443 0006 1B78     	 ldrb r3,[r3]
- 1444 0008 CC2B     	 cmp r3,#204
- 1445 000a 07D1     	 bne .L45
-  45:../communications.h **** 	{
-  46:../communications.h **** 		rxData[0] = rxByte;
- 1446              	 .loc 6 46 0
- 1447 000c 184B     	 ldr r3,.L48
- 1448 000e 1A78     	 ldrb r2,[r3]
- 1449 0010 184B     	 ldr r3,.L48+4
- 1450 0012 1A70     	 strb r2,[r3]
-  47:../communications.h **** 		iterator_wiadomosci = 1;
- 1451              	 .loc 6 47 0
- 1452 0014 184B     	 ldr r3,.L48+8
- 1453 0016 0122     	 movs r2,#1
- 1454 0018 1A70     	 strb r2,[r3]
- 1455 001a 23E0     	 b .L46
- 1456              	.L45:
-  48:../communications.h **** 	}
-  49:../communications.h **** 	else if (rxByte == EOF)
- 1457              	 .loc 6 49 0
- 1458 001c 144B     	 ldr r3,.L48
- 1459 001e 1B78     	 ldrb r3,[r3]
- 1460 0020 DD2B     	 cmp r3,#221
- 1461 0022 0ED1     	 bne .L47
-  50:../communications.h **** 	{
-  51:../communications.h **** 		rxData[iterator_wiadomosci +1] = EOF;
- 1462              	 .loc 6 51 0
- 1463 0024 144B     	 ldr r3,.L48+8
- 1464 0026 1B78     	 ldrb r3,[r3]
- 1465 0028 0133     	 adds r3,r3,#1
- 1466 002a 124A     	 ldr r2,.L48+4
- 1467 002c DD21     	 movs r1,#221
- 1468 002e D154     	 strb r1,[r2,r3]
-  52:../communications.h **** 		iterator_wiadomosci++;
- 1469              	 .loc 6 52 0
- 1470 0030 114B     	 ldr r3,.L48+8
- 1471 0032 1B78     	 ldrb r3,[r3]
- 1472 0034 0133     	 adds r3,r3,#1
- 1473 0036 DAB2     	 uxtb r2,r3
- 1474 0038 0F4B     	 ldr r3,.L48+8
- 1475 003a 1A70     	 strb r2,[r3]
-  53:../communications.h **** 		Message_interpreter();
- 1476              	 .loc 6 53 0
- 1477 003c FFF7FEFF 	 bl Message_interpreter
- 1478 0040 10E0     	 b .L46
- 1479              	.L47:
+ 1350 0074 80BD     	 pop {r7,pc}
+ 1351              	.L40:
+ 1352 0076 00BF     	 .align 2
+ 1353              	.L39:
+ 1354 0078 00000000 	 .word txData
+ 1355              	 .cfi_endproc
+ 1356              	.LFE329:
+ 1358              	 .section .text.XMC_Check,"ax",%progbits
+ 1359              	 .align 2
+ 1360              	 .global XMC_Check
+ 1361              	 .thumb
+ 1362              	 .thumb_func
+ 1364              	XMC_Check:
+ 1365              	.LFB330:
+  35:../communications.h **** void XMC_Check()
+  36:../communications.h **** {
+ 1366              	 .loc 6 36 0
+ 1367              	 .cfi_startproc
+ 1368              	 
+ 1369              	 
+ 1370 0000 80B5     	 push {r7,lr}
+ 1371              	.LCFI83:
+ 1372              	 .cfi_def_cfa_offset 8
+ 1373              	 .cfi_offset 7,-8
+ 1374              	 .cfi_offset 14,-4
+ 1375 0002 82B0     	 sub sp,sp,#8
+ 1376              	.LCFI84:
+ 1377              	 .cfi_def_cfa_offset 16
+ 1378 0004 00AF     	 add r7,sp,#0
+ 1379              	.LCFI85:
+ 1380              	 .cfi_def_cfa_register 7
+ 1381              	.LBB4:
+  37:../communications.h **** 	for(uint8_t i = 0; i < 8; i++)		//iterate to check state of all drivers
+ 1382              	 .loc 6 37 0
+ 1383 0006 0023     	 movs r3,#0
+ 1384 0008 FB71     	 strb r3,[r7,#7]
+ 1385 000a 1AE0     	 b .L42
+ 1386              	.L43:
+  38:../communications.h **** 	{
+  39:../communications.h **** 		DIGITAL_IO_SetOutputHigh(&LED1);
+ 1387              	 .loc 6 39 0 discriminator 3
+ 1388 000c 1048     	 ldr r0,.L44
+ 1389 000e FFF7FEFF 	 bl DIGITAL_IO_SetOutputHigh
+  40:../communications.h **** 		txData[1] = 0x10 + i;
+ 1390              	 .loc 6 40 0 discriminator 3
+ 1391 0012 FB79     	 ldrb r3,[r7,#7]
+ 1392 0014 1033     	 adds r3,r3,#16
+ 1393 0016 DAB2     	 uxtb r2,r3
+ 1394 0018 0E4B     	 ldr r3,.L44+4
+ 1395 001a 5A70     	 strb r2,[r3,#1]
+  41:../communications.h **** 		txData[2] = 0xA3;
+ 1396              	 .loc 6 41 0 discriminator 3
+ 1397 001c 0D4B     	 ldr r3,.L44+4
+ 1398 001e A322     	 movs r2,#163
+ 1399 0020 9A70     	 strb r2,[r3,#2]
+  42:../communications.h **** 		txData[3] = EOF;
+ 1400              	 .loc 6 42 0 discriminator 3
+ 1401 0022 0C4B     	 ldr r3,.L44+4
+ 1402 0024 DD22     	 movs r2,#221
+ 1403 0026 DA70     	 strb r2,[r3,#3]
+  43:../communications.h **** 		Send(4);
+ 1404              	 .loc 6 43 0 discriminator 3
+ 1405 0028 0420     	 movs r0,#4
+ 1406 002a FFF7FEFF 	 bl Send
+  44:../communications.h **** 		delay(300);
+ 1407              	 .loc 6 44 0 discriminator 3
+ 1408 002e 4FF49670 	 mov r0,#300
+ 1409 0032 FFF7FEFF 	 bl delay
+  45:../communications.h **** 		DIGITAL_IO_SetOutputLow((&LED1));
+ 1410              	 .loc 6 45 0 discriminator 3
+ 1411 0036 0648     	 ldr r0,.L44
+ 1412 0038 FFF7FEFF 	 bl DIGITAL_IO_SetOutputLow
+  37:../communications.h **** 	{
+ 1413              	 .loc 6 37 0 discriminator 3
+ 1414 003c FB79     	 ldrb r3,[r7,#7]
+ 1415 003e 0133     	 adds r3,r3,#1
+ 1416 0040 FB71     	 strb r3,[r7,#7]
+ 1417              	.L42:
+  37:../communications.h **** 	{
+ 1418              	 .loc 6 37 0 is_stmt 0 discriminator 1
+ 1419 0042 FB79     	 ldrb r3,[r7,#7]
+ 1420 0044 072B     	 cmp r3,#7
+ 1421 0046 E1D9     	 bls .L43
+ 1422              	.LBE4:
+  46:../communications.h **** 	}
+  47:../communications.h **** }
+ 1423              	 .loc 6 47 0 is_stmt 1
+ 1424 0048 0837     	 adds r7,r7,#8
+ 1425              	.LCFI86:
+ 1426              	 .cfi_def_cfa_offset 8
+ 1427 004a BD46     	 mov sp,r7
+ 1428              	.LCFI87:
+ 1429              	 .cfi_def_cfa_register 13
+ 1430              	 
+ 1431 004c 80BD     	 pop {r7,pc}
+ 1432              	.L45:
+ 1433 004e 00BF     	 .align 2
+ 1434              	.L44:
+ 1435 0050 00000000 	 .word LED1
+ 1436 0054 00000000 	 .word txData
+ 1437              	 .cfi_endproc
+ 1438              	.LFE330:
+ 1440              	 .section .text.eorx,"ax",%progbits
+ 1441              	 .align 2
+ 1442              	 .global eorx
+ 1443              	 .thumb
+ 1444              	 .thumb_func
+ 1446              	eorx:
+ 1447              	.LFB331:
+  48:../communications.h **** void eorx()
+  49:../communications.h **** {
+ 1448              	 .loc 6 49 0
+ 1449              	 .cfi_startproc
+ 1450              	 
+ 1451              	 
+ 1452 0000 80B5     	 push {r7,lr}
+ 1453              	.LCFI88:
+ 1454              	 .cfi_def_cfa_offset 8
+ 1455              	 .cfi_offset 7,-8
+ 1456              	 .cfi_offset 14,-4
+ 1457 0002 00AF     	 add r7,sp,#0
+ 1458              	.LCFI89:
+ 1459              	 .cfi_def_cfa_register 7
+  50:../communications.h **** 	if(rxByte == SOF)
+ 1460              	 .loc 6 50 0
+ 1461 0004 1A4B     	 ldr r3,.L50
+ 1462 0006 1B78     	 ldrb r3,[r3]
+ 1463 0008 CC2B     	 cmp r3,#204
+ 1464 000a 07D1     	 bne .L47
+  51:../communications.h **** 	{
+  52:../communications.h **** 		rxData[0] = rxByte;
+ 1465              	 .loc 6 52 0
+ 1466 000c 184B     	 ldr r3,.L50
+ 1467 000e 1A78     	 ldrb r2,[r3]
+ 1468 0010 184B     	 ldr r3,.L50+4
+ 1469 0012 1A70     	 strb r2,[r3]
+  53:../communications.h **** 		iterator_wiadomosci = 1;
+ 1470              	 .loc 6 53 0
+ 1471 0014 184B     	 ldr r3,.L50+8
+ 1472 0016 0122     	 movs r2,#1
+ 1473 0018 1A70     	 strb r2,[r3]
+ 1474 001a 23E0     	 b .L48
+ 1475              	.L47:
   54:../communications.h **** 	}
-  55:../communications.h **** 	else if ( iterator_wiadomosci < 9)
- 1480              	 .loc 6 55 0
- 1481 0042 0D4B     	 ldr r3,.L48+8
- 1482 0044 1B78     	 ldrb r3,[r3]
- 1483 0046 082B     	 cmp r3,#8
- 1484 0048 0CD8     	 bhi .L46
+  55:../communications.h **** 	else if (rxByte == EOF)
+ 1476              	 .loc 6 55 0
+ 1477 001c 144B     	 ldr r3,.L50
+ 1478 001e 1B78     	 ldrb r3,[r3]
+ 1479 0020 DD2B     	 cmp r3,#221
+ 1480 0022 0ED1     	 bne .L49
   56:../communications.h **** 	{
-  57:../communications.h **** 		rxData[iterator_wiadomosci] =rxByte;
- 1485              	 .loc 6 57 0
- 1486 004a 0B4B     	 ldr r3,.L48+8
- 1487 004c 1B78     	 ldrb r3,[r3]
- 1488 004e 1A46     	 mov r2,r3
- 1489 0050 074B     	 ldr r3,.L48
- 1490 0052 1978     	 ldrb r1,[r3]
- 1491 0054 074B     	 ldr r3,.L48+4
- 1492 0056 9954     	 strb r1,[r3,r2]
+  57:../communications.h **** 		rxData[iterator_wiadomosci +1] = EOF;
+ 1481              	 .loc 6 57 0
+ 1482 0024 144B     	 ldr r3,.L50+8
+ 1483 0026 1B78     	 ldrb r3,[r3]
+ 1484 0028 0133     	 adds r3,r3,#1
+ 1485 002a 124A     	 ldr r2,.L50+4
+ 1486 002c DD21     	 movs r1,#221
+ 1487 002e D154     	 strb r1,[r2,r3]
   58:../communications.h **** 		iterator_wiadomosci++;
- 1493              	 .loc 6 58 0
- 1494 0058 074B     	 ldr r3,.L48+8
- 1495 005a 1B78     	 ldrb r3,[r3]
- 1496 005c 0133     	 adds r3,r3,#1
- 1497 005e DAB2     	 uxtb r2,r3
- 1498 0060 054B     	 ldr r3,.L48+8
- 1499 0062 1A70     	 strb r2,[r3]
- 1500              	.L46:
-  59:../communications.h **** 	}
-  60:../communications.h **** 	UART_Receive(&RS, &rxByte,1);
- 1501              	 .loc 6 60 0
- 1502 0064 0548     	 ldr r0,.L48+12
- 1503 0066 0249     	 ldr r1,.L48
- 1504 0068 0122     	 movs r2,#1
- 1505 006a FFF7FEFF 	 bl UART_Receive
-  61:../communications.h **** }
- 1506              	 .loc 6 61 0
- 1507 006e 80BD     	 pop {r7,pc}
- 1508              	.L49:
- 1509              	 .align 2
- 1510              	.L48:
- 1511 0070 00000000 	 .word rxByte
- 1512 0074 00000000 	 .word rxData
- 1513 0078 00000000 	 .word iterator_wiadomosci
- 1514 007c 00000000 	 .word RS
- 1515              	 .cfi_endproc
- 1516              	.LFE331:
- 1518              	 .section .text.eotx,"ax",%progbits
- 1519              	 .align 2
- 1520              	 .global eotx
- 1521              	 .thumb
- 1522              	 .thumb_func
- 1524              	eotx:
- 1525              	.LFB332:
-  62:../communications.h **** void eotx()
-  63:../communications.h **** {
- 1526              	 .loc 6 63 0
- 1527              	 .cfi_startproc
- 1528              	 
- 1529              	 
- 1530              	 
- 1531 0000 80B4     	 push {r7}
- 1532              	.LCFI89:
- 1533              	 .cfi_def_cfa_offset 4
- 1534              	 .cfi_offset 7,-4
- 1535 0002 00AF     	 add r7,sp,#0
- 1536              	.LCFI90:
- 1537              	 .cfi_def_cfa_register 7
-  64:../communications.h **** 
-  65:../communications.h **** }
- 1538              	 .loc 6 65 0
- 1539 0004 BD46     	 mov sp,r7
- 1540              	.LCFI91:
- 1541              	 .cfi_def_cfa_register 13
- 1542              	 
- 1543 0006 5DF8047B 	 ldr r7,[sp],#4
- 1544              	.LCFI92:
- 1545              	 .cfi_restore 7
- 1546              	 .cfi_def_cfa_offset 0
- 1547 000a 7047     	 bx lr
- 1548              	 .cfi_endproc
- 1549              	.LFE332:
- 1551              	 .section .text.Message_interpreter,"ax",%progbits
- 1552              	 .align 2
- 1553              	 .global Message_interpreter
- 1554              	 .thumb
- 1555              	 .thumb_func
- 1557              	Message_interpreter:
- 1558              	.LFB333:
-  66:../communications.h **** void Message_interpreter()
-  67:../communications.h **** {
- 1559              	 .loc 6 67 0
- 1560              	 .cfi_startproc
+ 1488              	 .loc 6 58 0
+ 1489 0030 114B     	 ldr r3,.L50+8
+ 1490 0032 1B78     	 ldrb r3,[r3]
+ 1491 0034 0133     	 adds r3,r3,#1
+ 1492 0036 DAB2     	 uxtb r2,r3
+ 1493 0038 0F4B     	 ldr r3,.L50+8
+ 1494 003a 1A70     	 strb r2,[r3]
+  59:../communications.h **** 		Message_interpreter();
+ 1495              	 .loc 6 59 0
+ 1496 003c FFF7FEFF 	 bl Message_interpreter
+ 1497 0040 10E0     	 b .L48
+ 1498              	.L49:
+  60:../communications.h **** 	}
+  61:../communications.h **** 	else if ( iterator_wiadomosci < 9)
+ 1499              	 .loc 6 61 0
+ 1500 0042 0D4B     	 ldr r3,.L50+8
+ 1501 0044 1B78     	 ldrb r3,[r3]
+ 1502 0046 082B     	 cmp r3,#8
+ 1503 0048 0CD8     	 bhi .L48
+  62:../communications.h **** 	{
+  63:../communications.h **** 		rxData[iterator_wiadomosci] =rxByte;
+ 1504              	 .loc 6 63 0
+ 1505 004a 0B4B     	 ldr r3,.L50+8
+ 1506 004c 1B78     	 ldrb r3,[r3]
+ 1507 004e 1A46     	 mov r2,r3
+ 1508 0050 074B     	 ldr r3,.L50
+ 1509 0052 1978     	 ldrb r1,[r3]
+ 1510 0054 074B     	 ldr r3,.L50+4
+ 1511 0056 9954     	 strb r1,[r3,r2]
+  64:../communications.h **** 		iterator_wiadomosci++;
+ 1512              	 .loc 6 64 0
+ 1513 0058 074B     	 ldr r3,.L50+8
+ 1514 005a 1B78     	 ldrb r3,[r3]
+ 1515 005c 0133     	 adds r3,r3,#1
+ 1516 005e DAB2     	 uxtb r2,r3
+ 1517 0060 054B     	 ldr r3,.L50+8
+ 1518 0062 1A70     	 strb r2,[r3]
+ 1519              	.L48:
+  65:../communications.h **** 	}
+  66:../communications.h **** 	UART_Receive(&RS, &rxByte,1);
+ 1520              	 .loc 6 66 0
+ 1521 0064 0548     	 ldr r0,.L50+12
+ 1522 0066 0249     	 ldr r1,.L50
+ 1523 0068 0122     	 movs r2,#1
+ 1524 006a FFF7FEFF 	 bl UART_Receive
+  67:../communications.h **** }
+ 1525              	 .loc 6 67 0
+ 1526 006e 80BD     	 pop {r7,pc}
+ 1527              	.L51:
+ 1528              	 .align 2
+ 1529              	.L50:
+ 1530 0070 00000000 	 .word rxByte
+ 1531 0074 00000000 	 .word rxData
+ 1532 0078 00000000 	 .word iterator_wiadomosci
+ 1533 007c 00000000 	 .word RS
+ 1534              	 .cfi_endproc
+ 1535              	.LFE331:
+ 1537              	 .section .text.eotx,"ax",%progbits
+ 1538              	 .align 2
+ 1539              	 .global eotx
+ 1540              	 .thumb
+ 1541              	 .thumb_func
+ 1543              	eotx:
+ 1544              	.LFB332:
+  68:../communications.h **** void eotx()
+  69:../communications.h **** {
+ 1545              	 .loc 6 69 0
+ 1546              	 .cfi_startproc
+ 1547              	 
+ 1548              	 
+ 1549              	 
+ 1550 0000 80B4     	 push {r7}
+ 1551              	.LCFI90:
+ 1552              	 .cfi_def_cfa_offset 4
+ 1553              	 .cfi_offset 7,-4
+ 1554 0002 00AF     	 add r7,sp,#0
+ 1555              	.LCFI91:
+ 1556              	 .cfi_def_cfa_register 7
+  70:../communications.h **** 
+  71:../communications.h **** }
+ 1557              	 .loc 6 71 0
+ 1558 0004 BD46     	 mov sp,r7
+ 1559              	.LCFI92:
+ 1560              	 .cfi_def_cfa_register 13
  1561              	 
- 1562              	 
- 1563              	 
- 1564 0000 80B4     	 push {r7}
- 1565              	.LCFI93:
- 1566              	 .cfi_def_cfa_offset 4
- 1567              	 .cfi_offset 7,-4
- 1568 0002 83B0     	 sub sp,sp,#12
- 1569              	.LCFI94:
- 1570              	 .cfi_def_cfa_offset 16
- 1571 0004 00AF     	 add r7,sp,#0
- 1572              	.LCFI95:
- 1573              	 .cfi_def_cfa_register 7
-  68:../communications.h **** 
-  69:../communications.h **** 	if(rxData[0] == SOF && rxData[1] == adress)
- 1574              	 .loc 6 69 0
- 1575 0006 294B     	 ldr r3,.L55
- 1576 0008 1B78     	 ldrb r3,[r3]
- 1577 000a CC2B     	 cmp r3,#204
- 1578 000c 49D1     	 bne .L51
- 1579              	 .loc 6 69 0 is_stmt 0 discriminator 1
- 1580 000e 274B     	 ldr r3,.L55
- 1581 0010 5A78     	 ldrb r2,[r3,#1]
- 1582 0012 274B     	 ldr r3,.L55+4
- 1583 0014 1B78     	 ldrb r3,[r3]
- 1584 0016 9A42     	 cmp r2,r3
- 1585 0018 43D1     	 bne .L51
- 1586              	.LBB5:
-  70:../communications.h **** 	{
-  71:../communications.h **** 		uint8_t numer_silnika;
-  72:../communications.h **** 		numer_silnika = rxData[2] - 0x10;
- 1587              	 .loc 6 72 0 is_stmt 1
- 1588 001a 244B     	 ldr r3,.L55
- 1589 001c 9B78     	 ldrb r3,[r3,#2]
- 1590 001e 103B     	 subs r3,r3,#16
- 1591 0020 FB71     	 strb r3,[r7,#7]
-  73:../communications.h **** 		if(rxData[3] == INIT)
- 1592              	 .loc 6 73 0
- 1593 0022 224B     	 ldr r3,.L55
- 1594 0024 DB78     	 ldrb r3,[r3,#3]
- 1595 0026 A12B     	 cmp r3,#161
- 1596 0028 07D1     	 bne .L53
-  74:../communications.h **** 			stanowisko.silnik_start[numer_silnika] = rxData[4];
- 1597              	 .loc 6 74 0
- 1598 002a FB79     	 ldrb r3,[r7,#7]
- 1599 002c 1F4A     	 ldr r2,.L55
- 1600 002e 1179     	 ldrb r1,[r2,#4]
- 1601 0030 204A     	 ldr r2,.L55+8
- 1602 0032 1344     	 add r3,r3,r2
- 1603 0034 0A46     	 mov r2,r1
- 1604 0036 9A70     	 strb r2,[r3,#2]
- 1605 0038 33E0     	 b .L51
- 1606              	.L53:
-  75:../communications.h **** 		else if(rxData[3] == CHECK)
- 1607              	 .loc 6 75 0
- 1608 003a 1C4B     	 ldr r3,.L55
- 1609 003c DB78     	 ldrb r3,[r3,#3]
- 1610 003e A32B     	 cmp r3,#163
- 1611 0040 0CD1     	 bne .L54
-  76:../communications.h **** 		{
-  77:../communications.h **** 			stanowisko.silnik_start[numer_silnika] = rxData[4];
- 1612              	 .loc 6 77 0
- 1613 0042 FB79     	 ldrb r3,[r7,#7]
- 1614 0044 194A     	 ldr r2,.L55
- 1615 0046 1179     	 ldrb r1,[r2,#4]
- 1616 0048 1A4A     	 ldr r2,.L55+8
- 1617 004a 1344     	 add r3,r3,r2
- 1618 004c 0A46     	 mov r2,r1
- 1619 004e 9A70     	 strb r2,[r3,#2]
-  78:../communications.h **** 			stanowisko.silnik_numer[numer_silnika] = rxData[5];
- 1620              	 .loc 6 78 0
- 1621 0050 FB79     	 ldrb r3,[r7,#7]
- 1622 0052 164A     	 ldr r2,.L55
- 1623 0054 5179     	 ldrb r1,[r2,#5]
- 1624 0056 174A     	 ldr r2,.L55+8
- 1625 0058 D154     	 strb r1,[r2,r3]
- 1626 005a 22E0     	 b .L51
- 1627              	.L54:
-  79:../communications.h **** 		}
-  80:../communications.h **** 		else
-  81:../communications.h **** 		{
-  82:../communications.h **** 			stanowisko.i_net[numer_silnika] =rxData[3] << 8 | rxData[4];
- 1628              	 .loc 6 82 0
- 1629 005c FB79     	 ldrb r3,[r7,#7]
- 1630 005e 134A     	 ldr r2,.L55
- 1631 0060 D278     	 ldrb r2,[r2,#3]
- 1632 0062 1202     	 lsls r2,r2,#8
- 1633 0064 91B2     	 uxth r1,r2
- 1634 0066 114A     	 ldr r2,.L55
- 1635 0068 1279     	 ldrb r2,[r2,#4]
- 1636 006a 92B2     	 uxth r2,r2
- 1637 006c 0A43     	 orrs r2,r2,r1
- 1638 006e 91B2     	 uxth r1,r2
- 1639 0070 104A     	 ldr r2,.L55+8
- 1640 0072 5B00     	 lsls r3,r3,#1
- 1641 0074 1344     	 add r3,r3,r2
- 1642 0076 0A46     	 mov r2,r1
- 1643 0078 DA80     	 strh r2,[r3,#6]
-  83:../communications.h **** 			stanowisko.kat_abs[numer_silnika] = rxData[5] << 24 | rxData[6] << 16 | rxData[7] << 8 | rxData[
- 1644              	 .loc 6 83 0
- 1645 007a FB79     	 ldrb r3,[r7,#7]
- 1646 007c 0B4A     	 ldr r2,.L55
- 1647 007e 5279     	 ldrb r2,[r2,#5]
- 1648 0080 1106     	 lsls r1,r2,#24
- 1649 0082 0A4A     	 ldr r2,.L55
- 1650 0084 9279     	 ldrb r2,[r2,#6]
- 1651 0086 1204     	 lsls r2,r2,#16
- 1652 0088 1143     	 orrs r1,r1,r2
- 1653 008a 084A     	 ldr r2,.L55
- 1654 008c D279     	 ldrb r2,[r2,#7]
- 1655 008e 1202     	 lsls r2,r2,#8
- 1656 0090 0A43     	 orrs r2,r2,r1
- 1657 0092 0649     	 ldr r1,.L55
- 1658 0094 097A     	 ldrb r1,[r1,#8]
- 1659 0096 0A43     	 orrs r2,r2,r1
- 1660 0098 0649     	 ldr r1,.L55+8
- 1661 009a 0233     	 adds r3,r3,#2
- 1662 009c 9B00     	 lsls r3,r3,#2
- 1663 009e 0B44     	 add r3,r3,r1
- 1664 00a0 5A60     	 str r2,[r3,#4]
- 1665              	.L51:
- 1666              	.LBE5:
-  84:../communications.h **** 		}
-  85:../communications.h **** 	}
-  86:../communications.h **** 
-  87:../communications.h **** }
- 1667              	 .loc 6 87 0
- 1668 00a2 0C37     	 adds r7,r7,#12
- 1669              	.LCFI96:
- 1670              	 .cfi_def_cfa_offset 4
- 1671 00a4 BD46     	 mov sp,r7
- 1672              	.LCFI97:
- 1673              	 .cfi_def_cfa_register 13
- 1674              	 
- 1675 00a6 5DF8047B 	 ldr r7,[sp],#4
- 1676              	.LCFI98:
- 1677              	 .cfi_restore 7
- 1678              	 .cfi_def_cfa_offset 0
- 1679 00aa 7047     	 bx lr
- 1680              	.L56:
- 1681              	 .align 2
- 1682              	.L55:
- 1683 00ac 00000000 	 .word rxData
- 1684 00b0 00000000 	 .word adress
- 1685 00b4 00000000 	 .word stanowisko
- 1686              	 .cfi_endproc
- 1687              	.LFE333:
- 1689              	 .section .text.Send_Leg,"ax",%progbits
- 1690              	 .align 2
- 1691              	 .global Send_Leg
- 1692              	 .thumb
- 1693              	 .thumb_func
- 1695              	Send_Leg:
- 1696              	.LFB334:
-  88:../communications.h **** void Send_Leg(struct Leg *n)
-  89:../communications.h **** {
- 1697              	 .loc 6 89 0
- 1698              	 .cfi_startproc
- 1699              	 
- 1700              	 
- 1701 0000 80B5     	 push {r7,lr}
- 1702              	.LCFI99:
- 1703              	 .cfi_def_cfa_offset 8
- 1704              	 .cfi_offset 7,-8
- 1705              	 .cfi_offset 14,-4
- 1706 0002 82B0     	 sub sp,sp,#8
- 1707              	.LCFI100:
- 1708              	 .cfi_def_cfa_offset 16
- 1709 0004 00AF     	 add r7,sp,#0
- 1710              	.LCFI101:
- 1711              	 .cfi_def_cfa_register 7
- 1712 0006 7860     	 str r0,[r7,#4]
-  90:../communications.h **** 	  txData[1] = n->adresy[0];
- 1713              	 .loc 6 90 0
- 1714 0008 7B68     	 ldr r3,[r7,#4]
- 1715 000a 1A79     	 ldrb r2,[r3,#4]
- 1716 000c 194B     	 ldr r3,.L58
- 1717 000e 5A70     	 strb r2,[r3,#1]
-  91:../communications.h **** 	  txData[2] = n->poz_zad[0] >> 8;
- 1718              	 .loc 6 91 0
- 1719 0010 7B68     	 ldr r3,[r7,#4]
- 1720 0012 1B8F     	 ldrh r3,[r3,#56]
- 1721 0014 1BB2     	 sxth r3,r3
- 1722 0016 1B12     	 asrs r3,r3,#8
- 1723 0018 9BB2     	 uxth r3,r3
- 1724 001a DAB2     	 uxtb r2,r3
- 1725 001c 154B     	 ldr r3,.L58
- 1726 001e 9A70     	 strb r2,[r3,#2]
-  92:../communications.h **** 	  txData[3] = n->poz_zad[0];
- 1727              	 .loc 6 92 0
- 1728 0020 7B68     	 ldr r3,[r7,#4]
- 1729 0022 1B8F     	 ldrh r3,[r3,#56]
- 1730 0024 DAB2     	 uxtb r2,r3
- 1731 0026 134B     	 ldr r3,.L58
- 1732 0028 DA70     	 strb r2,[r3,#3]
-  93:../communications.h **** 	  txData[4] = EOF;
- 1733              	 .loc 6 93 0
- 1734 002a 124B     	 ldr r3,.L58
- 1735 002c DD22     	 movs r2,#221
- 1736 002e 1A71     	 strb r2,[r3,#4]
-  94:../communications.h **** 	  Send(5);
- 1737              	 .loc 6 94 0
- 1738 0030 0520     	 movs r0,#5
- 1739 0032 FFF7FEFF 	 bl Send
-  95:../communications.h **** 	  delay(500);
- 1740              	 .loc 6 95 0
- 1741 0036 4FF4FA70 	 mov r0,#500
- 1742 003a FFF7FEFF 	 bl delay
-  96:../communications.h **** 	  txData[1] = n->adresy[1];
- 1743              	 .loc 6 96 0
- 1744 003e 7B68     	 ldr r3,[r7,#4]
- 1745 0040 5A79     	 ldrb r2,[r3,#5]
- 1746 0042 0C4B     	 ldr r3,.L58
- 1747 0044 5A70     	 strb r2,[r3,#1]
-  97:../communications.h **** 	  txData[2] = n->poz_zad[1] >> 8;
- 1748              	 .loc 6 97 0
- 1749 0046 7B68     	 ldr r3,[r7,#4]
- 1750 0048 5B8F     	 ldrh r3,[r3,#58]
- 1751 004a 1BB2     	 sxth r3,r3
- 1752 004c 1B12     	 asrs r3,r3,#8
- 1753 004e 9BB2     	 uxth r3,r3
- 1754 0050 DAB2     	 uxtb r2,r3
- 1755 0052 084B     	 ldr r3,.L58
- 1756 0054 9A70     	 strb r2,[r3,#2]
-  98:../communications.h **** 	  txData[3] = n->poz_zad[1];
- 1757              	 .loc 6 98 0
- 1758 0056 7B68     	 ldr r3,[r7,#4]
- 1759 0058 5B8F     	 ldrh r3,[r3,#58]
- 1760 005a DAB2     	 uxtb r2,r3
- 1761 005c 054B     	 ldr r3,.L58
- 1762 005e DA70     	 strb r2,[r3,#3]
-  99:../communications.h **** 	  Send(5);
- 1763              	 .loc 6 99 0
- 1764 0060 0520     	 movs r0,#5
- 1765 0062 FFF7FEFF 	 bl Send
- 100:../communications.h **** 	  delay(500);
- 1766              	 .loc 6 100 0
- 1767 0066 4FF4FA70 	 mov r0,#500
- 1768 006a FFF7FEFF 	 bl delay
- 101:../communications.h **** }
- 1769              	 .loc 6 101 0
- 1770 006e 0837     	 adds r7,r7,#8
- 1771              	.LCFI102:
- 1772              	 .cfi_def_cfa_offset 8
- 1773 0070 BD46     	 mov sp,r7
- 1774              	.LCFI103:
- 1775              	 .cfi_def_cfa_register 13
- 1776              	 
- 1777 0072 80BD     	 pop {r7,pc}
- 1778              	.L59:
- 1779              	 .align 2
- 1780              	.L58:
- 1781 0074 00000000 	 .word txData
- 1782              	 .cfi_endproc
- 1783              	.LFE334:
- 1785              	 .section .text.Send,"ax",%progbits
- 1786              	 .align 2
- 1787              	 .global Send
- 1788              	 .thumb
- 1789              	 .thumb_func
- 1791              	Send:
- 1792              	.LFB335:
- 102:../communications.h **** void Send(uint8_t size )
- 103:../communications.h **** {
- 1793              	 .loc 6 103 0
- 1794              	 .cfi_startproc
- 1795              	 
- 1796              	 
- 1797 0000 80B5     	 push {r7,lr}
- 1798              	.LCFI104:
- 1799              	 .cfi_def_cfa_offset 8
- 1800              	 .cfi_offset 7,-8
- 1801              	 .cfi_offset 14,-4
- 1802 0002 82B0     	 sub sp,sp,#8
- 1803              	.LCFI105:
- 1804              	 .cfi_def_cfa_offset 16
- 1805 0004 00AF     	 add r7,sp,#0
- 1806              	.LCFI106:
- 1807              	 .cfi_def_cfa_register 7
- 1808 0006 0346     	 mov r3,r0
- 1809 0008 FB71     	 strb r3,[r7,#7]
- 104:../communications.h **** 	UART_Transmit(&RS, txData, size);
- 1810              	 .loc 6 104 0
- 1811 000a FB79     	 ldrb r3,[r7,#7]
- 1812 000c 0948     	 ldr r0,.L62
- 1813 000e 0A49     	 ldr r1,.L62+4
- 1814 0010 1A46     	 mov r2,r3
- 1815 0012 FFF7FEFF 	 bl UART_Transmit
- 105:../communications.h **** 	while(UART_IsTxBusy(&RS));
- 1816              	 .loc 6 105 0
- 1817 0016 00BF     	 nop
- 1818              	.L61:
- 1819              	 .loc 6 105 0 is_stmt 0 discriminator 1
- 1820 0018 0648     	 ldr r0,.L62
- 1821 001a FFF7FEFF 	 bl UART_IsTxBusy
- 1822 001e 0346     	 mov r3,r0
- 1823 0020 002B     	 cmp r3,#0
- 1824 0022 F9D1     	 bne .L61
- 106:../communications.h **** 	UART_Receive(&RS, &rxByte, 1);
- 1825              	 .loc 6 106 0 is_stmt 1
- 1826 0024 0348     	 ldr r0,.L62
- 1827 0026 0549     	 ldr r1,.L62+8
- 1828 0028 0122     	 movs r2,#1
- 1829 002a FFF7FEFF 	 bl UART_Receive
+ 1562 0006 5DF8047B 	 ldr r7,[sp],#4
+ 1563              	.LCFI93:
+ 1564              	 .cfi_restore 7
+ 1565              	 .cfi_def_cfa_offset 0
+ 1566 000a 7047     	 bx lr
+ 1567              	 .cfi_endproc
+ 1568              	.LFE332:
+ 1570              	 .section .text.Message_interpreter,"ax",%progbits
+ 1571              	 .align 2
+ 1572              	 .global Message_interpreter
+ 1573              	 .thumb
+ 1574              	 .thumb_func
+ 1576              	Message_interpreter:
+ 1577              	.LFB333:
+  72:../communications.h **** void Message_interpreter()
+  73:../communications.h **** {
+ 1578              	 .loc 6 73 0
+ 1579              	 .cfi_startproc
+ 1580              	 
+ 1581              	 
+ 1582              	 
+ 1583 0000 80B4     	 push {r7}
+ 1584              	.LCFI94:
+ 1585              	 .cfi_def_cfa_offset 4
+ 1586              	 .cfi_offset 7,-4
+ 1587 0002 83B0     	 sub sp,sp,#12
+ 1588              	.LCFI95:
+ 1589              	 .cfi_def_cfa_offset 16
+ 1590 0004 00AF     	 add r7,sp,#0
+ 1591              	.LCFI96:
+ 1592              	 .cfi_def_cfa_register 7
+  74:../communications.h **** 
+  75:../communications.h **** 	if(rxData[0] == SOF && rxData[1] == adress)
+ 1593              	 .loc 6 75 0
+ 1594 0006 294B     	 ldr r3,.L57
+ 1595 0008 1B78     	 ldrb r3,[r3]
+ 1596 000a CC2B     	 cmp r3,#204
+ 1597 000c 49D1     	 bne .L53
+ 1598              	 .loc 6 75 0 is_stmt 0 discriminator 1
+ 1599 000e 274B     	 ldr r3,.L57
+ 1600 0010 5A78     	 ldrb r2,[r3,#1]
+ 1601 0012 274B     	 ldr r3,.L57+4
+ 1602 0014 1B78     	 ldrb r3,[r3]
+ 1603 0016 9A42     	 cmp r2,r3
+ 1604 0018 43D1     	 bne .L53
+ 1605              	.LBB5:
+  76:../communications.h **** 	{
+  77:../communications.h **** 		uint8_t numer_silnika;
+  78:../communications.h **** 		numer_silnika = rxData[2] - 0x10;
+ 1606              	 .loc 6 78 0 is_stmt 1
+ 1607 001a 244B     	 ldr r3,.L57
+ 1608 001c 9B78     	 ldrb r3,[r3,#2]
+ 1609 001e 103B     	 subs r3,r3,#16
+ 1610 0020 FB71     	 strb r3,[r7,#7]
+  79:../communications.h **** 		if(rxData[3] == INIT)
+ 1611              	 .loc 6 79 0
+ 1612 0022 224B     	 ldr r3,.L57
+ 1613 0024 DB78     	 ldrb r3,[r3,#3]
+ 1614 0026 A12B     	 cmp r3,#161
+ 1615 0028 07D1     	 bne .L55
+  80:../communications.h **** 			stanowisko.motor_go[numer_silnika] = rxData[4];
+ 1616              	 .loc 6 80 0
+ 1617 002a FB79     	 ldrb r3,[r7,#7]
+ 1618 002c 1F4A     	 ldr r2,.L57
+ 1619 002e 1179     	 ldrb r1,[r2,#4]
+ 1620 0030 204A     	 ldr r2,.L57+8
+ 1621 0032 1344     	 add r3,r3,r2
+ 1622 0034 0A46     	 mov r2,r1
+ 1623 0036 9A70     	 strb r2,[r3,#2]
+ 1624 0038 33E0     	 b .L53
+ 1625              	.L55:
+  81:../communications.h **** 		else if(rxData[3] == CHECK)
+ 1626              	 .loc 6 81 0
+ 1627 003a 1C4B     	 ldr r3,.L57
+ 1628 003c DB78     	 ldrb r3,[r3,#3]
+ 1629 003e A32B     	 cmp r3,#163
+ 1630 0040 0CD1     	 bne .L56
+  82:../communications.h **** 		{
+  83:../communications.h **** 			stanowisko.motor_go[numer_silnika] = rxData[4];
+ 1631              	 .loc 6 83 0
+ 1632 0042 FB79     	 ldrb r3,[r7,#7]
+ 1633 0044 194A     	 ldr r2,.L57
+ 1634 0046 1179     	 ldrb r1,[r2,#4]
+ 1635 0048 1A4A     	 ldr r2,.L57+8
+ 1636 004a 1344     	 add r3,r3,r2
+ 1637 004c 0A46     	 mov r2,r1
+ 1638 004e 9A70     	 strb r2,[r3,#2]
+  84:../communications.h **** 			stanowisko.motor_n[numer_silnika] = rxData[5];
+ 1639              	 .loc 6 84 0
+ 1640 0050 FB79     	 ldrb r3,[r7,#7]
+ 1641 0052 164A     	 ldr r2,.L57
+ 1642 0054 5179     	 ldrb r1,[r2,#5]
+ 1643 0056 174A     	 ldr r2,.L57+8
+ 1644 0058 D154     	 strb r1,[r2,r3]
+ 1645 005a 22E0     	 b .L53
+ 1646              	.L56:
+  85:../communications.h **** 		}
+  86:../communications.h **** 		else
+  87:../communications.h **** 		{
+  88:../communications.h **** 			stanowisko.i_net[numer_silnika] =rxData[3] << 8 | rxData[4];
+ 1647              	 .loc 6 88 0
+ 1648 005c FB79     	 ldrb r3,[r7,#7]
+ 1649 005e 134A     	 ldr r2,.L57
+ 1650 0060 D278     	 ldrb r2,[r2,#3]
+ 1651 0062 1202     	 lsls r2,r2,#8
+ 1652 0064 91B2     	 uxth r1,r2
+ 1653 0066 114A     	 ldr r2,.L57
+ 1654 0068 1279     	 ldrb r2,[r2,#4]
+ 1655 006a 92B2     	 uxth r2,r2
+ 1656 006c 0A43     	 orrs r2,r2,r1
+ 1657 006e 91B2     	 uxth r1,r2
+ 1658 0070 104A     	 ldr r2,.L57+8
+ 1659 0072 5B00     	 lsls r3,r3,#1
+ 1660 0074 1344     	 add r3,r3,r2
+ 1661 0076 0A46     	 mov r2,r1
+ 1662 0078 DA80     	 strh r2,[r3,#6]
+  89:../communications.h **** 			stanowisko.ang_abs[numer_silnika] = rxData[5] << 24 | rxData[6] << 16 | rxData[7] << 8 | rxData[
+ 1663              	 .loc 6 89 0
+ 1664 007a FB79     	 ldrb r3,[r7,#7]
+ 1665 007c 0B4A     	 ldr r2,.L57
+ 1666 007e 5279     	 ldrb r2,[r2,#5]
+ 1667 0080 1106     	 lsls r1,r2,#24
+ 1668 0082 0A4A     	 ldr r2,.L57
+ 1669 0084 9279     	 ldrb r2,[r2,#6]
+ 1670 0086 1204     	 lsls r2,r2,#16
+ 1671 0088 1143     	 orrs r1,r1,r2
+ 1672 008a 084A     	 ldr r2,.L57
+ 1673 008c D279     	 ldrb r2,[r2,#7]
+ 1674 008e 1202     	 lsls r2,r2,#8
+ 1675 0090 0A43     	 orrs r2,r2,r1
+ 1676 0092 0649     	 ldr r1,.L57
+ 1677 0094 097A     	 ldrb r1,[r1,#8]
+ 1678 0096 0A43     	 orrs r2,r2,r1
+ 1679 0098 0649     	 ldr r1,.L57+8
+ 1680 009a 0233     	 adds r3,r3,#2
+ 1681 009c 9B00     	 lsls r3,r3,#2
+ 1682 009e 0B44     	 add r3,r3,r1
+ 1683 00a0 5A60     	 str r2,[r3,#4]
+ 1684              	.L53:
+ 1685              	.LBE5:
+  90:../communications.h **** 		}
+  91:../communications.h **** 	}
+  92:../communications.h **** 
+  93:../communications.h **** }
+ 1686              	 .loc 6 93 0
+ 1687 00a2 0C37     	 adds r7,r7,#12
+ 1688              	.LCFI97:
+ 1689              	 .cfi_def_cfa_offset 4
+ 1690 00a4 BD46     	 mov sp,r7
+ 1691              	.LCFI98:
+ 1692              	 .cfi_def_cfa_register 13
+ 1693              	 
+ 1694 00a6 5DF8047B 	 ldr r7,[sp],#4
+ 1695              	.LCFI99:
+ 1696              	 .cfi_restore 7
+ 1697              	 .cfi_def_cfa_offset 0
+ 1698 00aa 7047     	 bx lr
+ 1699              	.L58:
+ 1700              	 .align 2
+ 1701              	.L57:
+ 1702 00ac 00000000 	 .word rxData
+ 1703 00b0 00000000 	 .word adress
+ 1704 00b4 00000000 	 .word stanowisko
+ 1705              	 .cfi_endproc
+ 1706              	.LFE333:
+ 1708              	 .section .text.Send_Leg,"ax",%progbits
+ 1709              	 .align 2
+ 1710              	 .global Send_Leg
+ 1711              	 .thumb
+ 1712              	 .thumb_func
+ 1714              	Send_Leg:
+ 1715              	.LFB334:
+  94:../communications.h **** void Send_Leg(struct Leg *n)
+  95:../communications.h **** {
+ 1716              	 .loc 6 95 0
+ 1717              	 .cfi_startproc
+ 1718              	 
+ 1719              	 
+ 1720 0000 80B5     	 push {r7,lr}
+ 1721              	.LCFI100:
+ 1722              	 .cfi_def_cfa_offset 8
+ 1723              	 .cfi_offset 7,-8
+ 1724              	 .cfi_offset 14,-4
+ 1725 0002 82B0     	 sub sp,sp,#8
+ 1726              	.LCFI101:
+ 1727              	 .cfi_def_cfa_offset 16
+ 1728 0004 00AF     	 add r7,sp,#0
+ 1729              	.LCFI102:
+ 1730              	 .cfi_def_cfa_register 7
+ 1731 0006 7860     	 str r0,[r7,#4]
+  96:../communications.h **** 	  txData[1] = n->adresy[0];
+ 1732              	 .loc 6 96 0
+ 1733 0008 7B68     	 ldr r3,[r7,#4]
+ 1734 000a 1A79     	 ldrb r2,[r3,#4]
+ 1735 000c 194B     	 ldr r3,.L60
+ 1736 000e 5A70     	 strb r2,[r3,#1]
+  97:../communications.h **** 	  txData[2] = n->poz_zad[0] >> 8;
+ 1737              	 .loc 6 97 0
+ 1738 0010 7B68     	 ldr r3,[r7,#4]
+ 1739 0012 1B8E     	 ldrh r3,[r3,#48]
+ 1740 0014 1BB2     	 sxth r3,r3
+ 1741 0016 1B12     	 asrs r3,r3,#8
+ 1742 0018 9BB2     	 uxth r3,r3
+ 1743 001a DAB2     	 uxtb r2,r3
+ 1744 001c 154B     	 ldr r3,.L60
+ 1745 001e 9A70     	 strb r2,[r3,#2]
+  98:../communications.h **** 	  txData[3] = n->poz_zad[0];
+ 1746              	 .loc 6 98 0
+ 1747 0020 7B68     	 ldr r3,[r7,#4]
+ 1748 0022 1B8E     	 ldrh r3,[r3,#48]
+ 1749 0024 DAB2     	 uxtb r2,r3
+ 1750 0026 134B     	 ldr r3,.L60
+ 1751 0028 DA70     	 strb r2,[r3,#3]
+  99:../communications.h **** 	  txData[4] = EOF;
+ 1752              	 .loc 6 99 0
+ 1753 002a 124B     	 ldr r3,.L60
+ 1754 002c DD22     	 movs r2,#221
+ 1755 002e 1A71     	 strb r2,[r3,#4]
+ 100:../communications.h **** 	  Send(5);
+ 1756              	 .loc 6 100 0
+ 1757 0030 0520     	 movs r0,#5
+ 1758 0032 FFF7FEFF 	 bl Send
+ 101:../communications.h **** 	  delay(500);
+ 1759              	 .loc 6 101 0
+ 1760 0036 4FF4FA70 	 mov r0,#500
+ 1761 003a FFF7FEFF 	 bl delay
+ 102:../communications.h **** 	  txData[1] = n->adresy[1];
+ 1762              	 .loc 6 102 0
+ 1763 003e 7B68     	 ldr r3,[r7,#4]
+ 1764 0040 5A79     	 ldrb r2,[r3,#5]
+ 1765 0042 0C4B     	 ldr r3,.L60
+ 1766 0044 5A70     	 strb r2,[r3,#1]
+ 103:../communications.h **** 	  txData[2] = n->poz_zad[1] >> 8;
+ 1767              	 .loc 6 103 0
+ 1768 0046 7B68     	 ldr r3,[r7,#4]
+ 1769 0048 5B8E     	 ldrh r3,[r3,#50]
+ 1770 004a 1BB2     	 sxth r3,r3
+ 1771 004c 1B12     	 asrs r3,r3,#8
+ 1772 004e 9BB2     	 uxth r3,r3
+ 1773 0050 DAB2     	 uxtb r2,r3
+ 1774 0052 084B     	 ldr r3,.L60
+ 1775 0054 9A70     	 strb r2,[r3,#2]
+ 104:../communications.h **** 	  txData[3] = n->poz_zad[1];
+ 1776              	 .loc 6 104 0
+ 1777 0056 7B68     	 ldr r3,[r7,#4]
+ 1778 0058 5B8E     	 ldrh r3,[r3,#50]
+ 1779 005a DAB2     	 uxtb r2,r3
+ 1780 005c 054B     	 ldr r3,.L60
+ 1781 005e DA70     	 strb r2,[r3,#3]
+ 105:../communications.h **** 	  Send(5);
+ 1782              	 .loc 6 105 0
+ 1783 0060 0520     	 movs r0,#5
+ 1784 0062 FFF7FEFF 	 bl Send
+ 106:../communications.h **** 	  delay(500);
+ 1785              	 .loc 6 106 0
+ 1786 0066 4FF4FA70 	 mov r0,#500
+ 1787 006a FFF7FEFF 	 bl delay
  107:../communications.h **** }
- 1830              	 .loc 6 107 0
- 1831 002e 0837     	 adds r7,r7,#8
- 1832              	.LCFI107:
- 1833              	 .cfi_def_cfa_offset 8
- 1834 0030 BD46     	 mov sp,r7
- 1835              	.LCFI108:
- 1836              	 .cfi_def_cfa_register 13
- 1837              	 
- 1838 0032 80BD     	 pop {r7,pc}
- 1839              	.L63:
- 1840              	 .align 2
- 1841              	.L62:
- 1842 0034 00000000 	 .word RS
- 1843 0038 00000000 	 .word txData
- 1844 003c 00000000 	 .word rxByte
- 1845              	 .cfi_endproc
- 1846              	.LFE335:
- 1848              	 .section .text.main,"ax",%progbits
- 1849              	 .align 2
- 1850              	 .global main
- 1851              	 .thumb
- 1852              	 .thumb_func
- 1854              	main:
- 1855              	.LFB336:
- 1856              	 .file 7 "../main.c"
+ 1788              	 .loc 6 107 0
+ 1789 006e 0837     	 adds r7,r7,#8
+ 1790              	.LCFI103:
+ 1791              	 .cfi_def_cfa_offset 8
+ 1792 0070 BD46     	 mov sp,r7
+ 1793              	.LCFI104:
+ 1794              	 .cfi_def_cfa_register 13
+ 1795              	 
+ 1796 0072 80BD     	 pop {r7,pc}
+ 1797              	.L61:
+ 1798              	 .align 2
+ 1799              	.L60:
+ 1800 0074 00000000 	 .word txData
+ 1801              	 .cfi_endproc
+ 1802              	.LFE334:
+ 1804              	 .section .text.Send,"ax",%progbits
+ 1805              	 .align 2
+ 1806              	 .global Send
+ 1807              	 .thumb
+ 1808              	 .thumb_func
+ 1810              	Send:
+ 1811              	.LFB335:
+ 108:../communications.h **** void Send(uint8_t size )
+ 109:../communications.h **** {
+ 1812              	 .loc 6 109 0
+ 1813              	 .cfi_startproc
+ 1814              	 
+ 1815              	 
+ 1816 0000 80B5     	 push {r7,lr}
+ 1817              	.LCFI105:
+ 1818              	 .cfi_def_cfa_offset 8
+ 1819              	 .cfi_offset 7,-8
+ 1820              	 .cfi_offset 14,-4
+ 1821 0002 82B0     	 sub sp,sp,#8
+ 1822              	.LCFI106:
+ 1823              	 .cfi_def_cfa_offset 16
+ 1824 0004 00AF     	 add r7,sp,#0
+ 1825              	.LCFI107:
+ 1826              	 .cfi_def_cfa_register 7
+ 1827 0006 0346     	 mov r3,r0
+ 1828 0008 FB71     	 strb r3,[r7,#7]
+ 110:../communications.h **** 	UART_Transmit(&RS, txData, size);
+ 1829              	 .loc 6 110 0
+ 1830 000a FB79     	 ldrb r3,[r7,#7]
+ 1831 000c 0948     	 ldr r0,.L64
+ 1832 000e 0A49     	 ldr r1,.L64+4
+ 1833 0010 1A46     	 mov r2,r3
+ 1834 0012 FFF7FEFF 	 bl UART_Transmit
+ 111:../communications.h **** 	while(UART_IsTxBusy(&RS));
+ 1835              	 .loc 6 111 0
+ 1836 0016 00BF     	 nop
+ 1837              	.L63:
+ 1838              	 .loc 6 111 0 is_stmt 0 discriminator 1
+ 1839 0018 0648     	 ldr r0,.L64
+ 1840 001a FFF7FEFF 	 bl UART_IsTxBusy
+ 1841 001e 0346     	 mov r3,r0
+ 1842 0020 002B     	 cmp r3,#0
+ 1843 0022 F9D1     	 bne .L63
+ 112:../communications.h **** 	UART_Receive(&RS, &rxByte, 1);
+ 1844              	 .loc 6 112 0 is_stmt 1
+ 1845 0024 0348     	 ldr r0,.L64
+ 1846 0026 0549     	 ldr r1,.L64+8
+ 1847 0028 0122     	 movs r2,#1
+ 1848 002a FFF7FEFF 	 bl UART_Receive
+ 113:../communications.h **** }
+ 1849              	 .loc 6 113 0
+ 1850 002e 0837     	 adds r7,r7,#8
+ 1851              	.LCFI108:
+ 1852              	 .cfi_def_cfa_offset 8
+ 1853 0030 BD46     	 mov sp,r7
+ 1854              	.LCFI109:
+ 1855              	 .cfi_def_cfa_register 13
+ 1856              	 
+ 1857 0032 80BD     	 pop {r7,pc}
+ 1858              	.L65:
+ 1859              	 .align 2
+ 1860              	.L64:
+ 1861 0034 00000000 	 .word RS
+ 1862 0038 00000000 	 .word txData
+ 1863 003c 00000000 	 .word rxByte
+ 1864              	 .cfi_endproc
+ 1865              	.LFE335:
+ 1867              	 .section .text.main,"ax",%progbits
+ 1868              	 .align 2
+ 1869              	 .global main
+ 1870              	 .thumb
+ 1871              	 .thumb_func
+ 1873              	main:
+ 1874              	.LFB336:
+ 1875              	 .file 7 "../main.c"
    1:../main.c     **** 
    2:../main.c     **** #include <DAVE.h>
    3:../main.c     **** #include <math.h>
@@ -4864,140 +4882,239 @@
    5:../main.c     **** #include "kinematics.h"
    6:../main.c     **** #include "communications.h"
    7:../main.c     **** 
-   8:../main.c     **** 
+   8:../main.c     **** uint8_t Motors_go_nogo();
    9:../main.c     **** 
-  10:../main.c     **** 
-  11:../main.c     **** int main(void)
-  12:../main.c     **** {
- 1857              	 .loc 7 12 0
- 1858              	 .cfi_startproc
- 1859              	 
- 1860              	 
- 1861 0000 80B5     	 push {r7,lr}
- 1862              	.LCFI109:
- 1863              	 .cfi_def_cfa_offset 8
- 1864              	 .cfi_offset 7,-8
- 1865              	 .cfi_offset 14,-4
- 1866 0002 82B0     	 sub sp,sp,#8
- 1867              	.LCFI110:
- 1868              	 .cfi_def_cfa_offset 16
- 1869 0004 00AF     	 add r7,sp,#0
- 1870              	.LCFI111:
- 1871              	 .cfi_def_cfa_register 7
-  13:../main.c     ****   DAVE_STATUS_t status;
-  14:../main.c     ****   status = DAVE_Init();
- 1872              	 .loc 7 14 0
- 1873 0006 FFF7FEFF 	 bl DAVE_Init
- 1874 000a 0346     	 mov r3,r0
- 1875 000c FB71     	 strb r3,[r7,#7]
-  15:../main.c     ****   while(status == DAVE_STATUS_FAILURE )
- 1876              	 .loc 7 15 0
- 1877 000e 05E0     	 b .L65
- 1878              	.L66:
-  16:../main.c     ****   {
-  17:../main.c     **** 	  delay(100000);
- 1879              	 .loc 7 17 0
- 1880 0010 1948     	 ldr r0,.L69
- 1881 0012 FFF7FEFF 	 bl delay
-  18:../main.c     **** 	   DIGITAL_IO_ToggleOutput(&LED1);
- 1882              	 .loc 7 18 0
- 1883 0016 1948     	 ldr r0,.L69+4
- 1884 0018 FFF7FEFF 	 bl DIGITAL_IO_ToggleOutput
- 1885              	.L65:
-  15:../main.c     ****   while(status == DAVE_STATUS_FAILURE )
- 1886              	 .loc 7 15 0
- 1887 001c FB79     	 ldrb r3,[r7,#7]
- 1888 001e 012B     	 cmp r3,#1
- 1889 0020 F6D0     	 beq .L66
-  19:../main.c     ****   }
-  20:../main.c     **** 
-  21:../main.c     ****   while(init == 0);
- 1890              	 .loc 7 21 0
- 1891 0022 00BF     	 nop
- 1892              	.L67:
- 1893              	 .loc 7 21 0 is_stmt 0 discriminator 1
- 1894 0024 164B     	 ldr r3,.L69+8
- 1895 0026 1B78     	 ldrb r3,[r3]
- 1896 0028 002B     	 cmp r3,#0
- 1897 002a FBD0     	 beq .L67
-  22:../main.c     ****   Init();
- 1898              	 .loc 7 22 0 is_stmt 1
- 1899 002c FFF7FEFF 	 bl Init
-  23:../main.c     ****   delay(2500);
- 1900              	 .loc 7 23 0
- 1901 0030 40F6C410 	 movw r0,#2500
- 1902 0034 FFF7FEFF 	 bl delay
-  24:../main.c     ****   XMC_Check();
- 1903              	 .loc 7 24 0
- 1904 0038 FFF7FEFF 	 bl XMC_Check
-  25:../main.c     ****   XMC_Init();
- 1905              	 .loc 7 25 0
- 1906 003c FFF7FEFF 	 bl XMC_Init
-  26:../main.c     ****   XMC_Check();
- 1907              	 .loc 7 26 0
- 1908 0040 FFF7FEFF 	 bl XMC_Check
- 1909              	.L68:
+  10:../main.c     **** int main(void)
+  11:../main.c     **** {
+ 1876              	 .loc 7 11 0
+ 1877              	 .cfi_startproc
+ 1878              	 
+ 1879              	 
+ 1880 0000 80B5     	 push {r7,lr}
+ 1881              	.LCFI110:
+ 1882              	 .cfi_def_cfa_offset 8
+ 1883              	 .cfi_offset 7,-8
+ 1884              	 .cfi_offset 14,-4
+ 1885 0002 82B0     	 sub sp,sp,#8
+ 1886              	.LCFI111:
+ 1887              	 .cfi_def_cfa_offset 16
+ 1888 0004 00AF     	 add r7,sp,#0
+ 1889              	.LCFI112:
+ 1890              	 .cfi_def_cfa_register 7
+  12:../main.c     ****   DAVE_STATUS_t status;
+  13:../main.c     ****   status = DAVE_Init();
+ 1891              	 .loc 7 13 0
+ 1892 0006 FFF7FEFF 	 bl DAVE_Init
+ 1893 000a 0346     	 mov r3,r0
+ 1894 000c FB71     	 strb r3,[r7,#7]
+  14:../main.c     ****   while(status == DAVE_STATUS_FAILURE )
+ 1895              	 .loc 7 14 0
+ 1896 000e 05E0     	 b .L67
+ 1897              	.L68:
+  15:../main.c     ****   {
+  16:../main.c     **** 	  delay(100000);
+ 1898              	 .loc 7 16 0
+ 1899 0010 1948     	 ldr r0,.L71
+ 1900 0012 FFF7FEFF 	 bl delay
+  17:../main.c     **** 	   DIGITAL_IO_ToggleOutput(&LED1);
+ 1901              	 .loc 7 17 0
+ 1902 0016 1948     	 ldr r0,.L71+4
+ 1903 0018 FFF7FEFF 	 bl DIGITAL_IO_ToggleOutput
+ 1904              	.L67:
+  14:../main.c     ****   while(status == DAVE_STATUS_FAILURE )
+ 1905              	 .loc 7 14 0
+ 1906 001c FB79     	 ldrb r3,[r7,#7]
+ 1907 001e 012B     	 cmp r3,#1
+ 1908 0020 F6D0     	 beq .L68
+  18:../main.c     ****   }
+  19:../main.c     **** 
+  20:../main.c     ****   while(init == 0);
+ 1909              	 .loc 7 20 0
+ 1910 0022 00BF     	 nop
+ 1911              	.L69:
+ 1912              	 .loc 7 20 0 is_stmt 0 discriminator 1
+ 1913 0024 164B     	 ldr r3,.L71+8
+ 1914 0026 1B78     	 ldrb r3,[r3]
+ 1915 0028 002B     	 cmp r3,#0
+ 1916 002a FBD0     	 beq .L69
+  21:../main.c     ****   Init();
+ 1917              	 .loc 7 21 0 is_stmt 1
+ 1918 002c FFF7FEFF 	 bl Init
+  22:../main.c     ****   delay(2500);
+ 1919              	 .loc 7 22 0
+ 1920 0030 40F6C410 	 movw r0,#2500
+ 1921 0034 FFF7FEFF 	 bl delay
+  23:../main.c     ****   XMC_Check();
+ 1922              	 .loc 7 23 0
+ 1923 0038 FFF7FEFF 	 bl XMC_Check
+  24:../main.c     ****   XMC_Init(10);
+ 1924              	 .loc 7 24 0
+ 1925 003c 0A20     	 movs r0,#10
+ 1926 003e FFF7FEFF 	 bl XMC_Init
+  25:../main.c     ****   XMC_Check();
+ 1927              	 .loc 7 25 0
+ 1928 0042 FFF7FEFF 	 bl XMC_Check
+ 1929              	.L70:
+  26:../main.c     **** 
   27:../main.c     **** 
-  28:../main.c     **** 
-  29:../main.c     ****   while(1)
-  30:../main.c     ****   {
-  31:../main.c     **** 	  update(&stanowisko);
- 1910              	 .loc 7 31 0 discriminator 1
- 1911 0044 0F48     	 ldr r0,.L69+12
- 1912 0046 FFF7FEFF 	 bl update
-  32:../main.c     **** 	  Spring(&stanowisko);
- 1913              	 .loc 7 32 0 discriminator 1
- 1914 004a 0E48     	 ldr r0,.L69+12
- 1915 004c FFF7FEFF 	 bl Spring
-  33:../main.c     **** 	  Send_Leg(&stanowisko);
- 1916              	 .loc 7 33 0 discriminator 1
- 1917 0050 0C48     	 ldr r0,.L69+12
- 1918 0052 FFF7FEFF 	 bl Send_Leg
-  34:../main.c     **** 	  t+= dt;
- 1919              	 .loc 7 34 0 discriminator 1
- 1920 0056 0C4B     	 ldr r3,.L69+16
- 1921 0058 93ED007A 	 flds s14,[r3]
- 1922 005c 0B4B     	 ldr r3,.L69+20
- 1923 005e D3ED007A 	 flds s15,[r3]
- 1924 0062 77EE277A 	 fadds s15,s14,s15
- 1925 0066 084B     	 ldr r3,.L69+16
- 1926 0068 C3ED007A 	 fsts s15,[r3]
-  35:../main.c     **** 	  delay(2000);
- 1927              	 .loc 7 35 0 discriminator 1
- 1928 006c 4FF4FA60 	 mov r0,#2000
- 1929 0070 FFF7FEFF 	 bl delay
-  36:../main.c     ****   }
- 1930              	 .loc 7 36 0 discriminator 1
- 1931 0074 E6E7     	 b .L68
- 1932              	.L70:
- 1933 0076 00BF     	 .align 2
- 1934              	.L69:
- 1935 0078 A0860100 	 .word 100000
- 1936 007c 00000000 	 .word LED1
- 1937 0080 00000000 	 .word init
- 1938 0084 00000000 	 .word stanowisko
- 1939 0088 00000000 	 .word t
- 1940 008c 00000000 	 .word dt
- 1941              	 .cfi_endproc
- 1942              	.LFE336:
- 1944              	 .text
- 1945              	.Letext0:
- 1946              	 .file 8 "c:\\davev4-64bit\\dave-4.3.2\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
- 1947              	 .file 9 "c:\\davev4-64bit\\dave-4.3.2\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
- 1948              	 .file 10 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/CMSIS/Infineon/XMC4500_series/Include/XMC4500.h"
- 1949              	 .file 11 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc4_scu.h"
- 1950              	 .file 12 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc4_gpio.h"
- 1951              	 .file 13 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc_usic.h"
- 1952              	 .file 14 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc_uart.h"
- 1953              	 .file 15 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc_ccu4.h"
- 1954              	 .file 16 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/GLOBAL_CCU4/global_ccu4.h"
- 1955              	 .file 17 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/TIMER/timer.h"
- 1956              	 .file 18 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/DAVE.h"
- 1957              	 .file 19 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/CMSIS/Include/core_cm4.h"
- 1958              	 .file 20 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/CMSIS/Infineon/XMC4500_series/Include/system_XMC4500.h"
- 1959              	 .file 21 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
- 1960              	 .file 22 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/TIMER/timer_extern.h"
- 1961              	 .file 23 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/UART/uart_extern.h"
+  28:../main.c     ****   while(1)
+  29:../main.c     ****   {
+  30:../main.c     **** 	  Update(&stanowisko);
+ 1930              	 .loc 7 30 0 discriminator 1
+ 1931 0046 0F48     	 ldr r0,.L71+12
+ 1932 0048 FFF7FEFF 	 bl Update
+  31:../main.c     **** 	  Spring(&stanowisko);
+ 1933              	 .loc 7 31 0 discriminator 1
+ 1934 004c 0D48     	 ldr r0,.L71+12
+ 1935 004e FFF7FEFF 	 bl Spring
+  32:../main.c     **** 	  Send_Leg(&stanowisko);
+ 1936              	 .loc 7 32 0 discriminator 1
+ 1937 0052 0C48     	 ldr r0,.L71+12
+ 1938 0054 FFF7FEFF 	 bl Send_Leg
+  33:../main.c     **** 	  t+= dt;
+ 1939              	 .loc 7 33 0 discriminator 1
+ 1940 0058 0B4B     	 ldr r3,.L71+16
+ 1941 005a 93ED007A 	 flds s14,[r3]
+ 1942 005e 0B4B     	 ldr r3,.L71+20
+ 1943 0060 D3ED007A 	 flds s15,[r3]
+ 1944 0064 77EE277A 	 fadds s15,s14,s15
+ 1945 0068 074B     	 ldr r3,.L71+16
+ 1946 006a C3ED007A 	 fsts s15,[r3]
+  34:../main.c     **** 	  delay(2000);
+ 1947              	 .loc 7 34 0 discriminator 1
+ 1948 006e 4FF4FA60 	 mov r0,#2000
+ 1949 0072 FFF7FEFF 	 bl delay
+  35:../main.c     ****   }
+ 1950              	 .loc 7 35 0 discriminator 1
+ 1951 0076 E6E7     	 b .L70
+ 1952              	.L72:
+ 1953              	 .align 2
+ 1954              	.L71:
+ 1955 0078 A0860100 	 .word 100000
+ 1956 007c 00000000 	 .word LED1
+ 1957 0080 00000000 	 .word init
+ 1958 0084 00000000 	 .word stanowisko
+ 1959 0088 00000000 	 .word t
+ 1960 008c 00000000 	 .word dt
+ 1961              	 .cfi_endproc
+ 1962              	.LFE336:
+ 1964              	 .section .text.Motors_go_nogo,"ax",%progbits
+ 1965              	 .align 2
+ 1966              	 .global Motors_go_nogo
+ 1967              	 .thumb
+ 1968              	 .thumb_func
+ 1970              	Motors_go_nogo:
+ 1971              	.LFB337:
+  36:../main.c     **** }
+  37:../main.c     **** 
+  38:../main.c     **** uint8_t Motors_go_nogo()
+  39:../main.c     **** {
+ 1972              	 .loc 7 39 0
+ 1973              	 .cfi_startproc
+ 1974              	 
+ 1975              	 
+ 1976              	 
+ 1977 0000 80B4     	 push {r7}
+ 1978              	.LCFI113:
+ 1979              	 .cfi_def_cfa_offset 4
+ 1980              	 .cfi_offset 7,-4
+ 1981 0002 83B0     	 sub sp,sp,#12
+ 1982              	.LCFI114:
+ 1983              	 .cfi_def_cfa_offset 16
+ 1984 0004 00AF     	 add r7,sp,#0
+ 1985              	.LCFI115:
+ 1986              	 .cfi_def_cfa_register 7
+ 1987              	.LBB6:
+  40:../main.c     **** 	for(uint8_t i =0; i < 2; i++)
+ 1988              	 .loc 7 40 0
+ 1989 0006 0023     	 movs r3,#0
+ 1990 0008 FB71     	 strb r3,[r7,#7]
+ 1991 000a 0BE0     	 b .L74
+ 1992              	.L76:
+  41:../main.c     **** 	{
+  42:../main.c     **** 		if(stanowisko.motor_go[i] == 0)
+ 1993              	 .loc 7 42 0
+ 1994 000c FB79     	 ldrb r3,[r7,#7]
+ 1995 000e 0D4A     	 ldr r2,.L79
+ 1996 0010 1344     	 add r3,r3,r2
+ 1997 0012 9B78     	 ldrb r3,[r3,#2]
+ 1998 0014 002B     	 cmp r3,#0
+ 1999 0016 02D1     	 bne .L75
+  43:../main.c     **** 			motors_go = 0;
+ 2000              	 .loc 7 43 0
+ 2001 0018 0B4B     	 ldr r3,.L79+4
+ 2002 001a 0022     	 movs r2,#0
+ 2003 001c 1A70     	 strb r2,[r3]
+ 2004              	.L75:
+  40:../main.c     **** 	for(uint8_t i =0; i < 2; i++)
+ 2005              	 .loc 7 40 0 discriminator 2
+ 2006 001e FB79     	 ldrb r3,[r7,#7]
+ 2007 0020 0133     	 adds r3,r3,#1
+ 2008 0022 FB71     	 strb r3,[r7,#7]
+ 2009              	.L74:
+  40:../main.c     **** 	for(uint8_t i =0; i < 2; i++)
+ 2010              	 .loc 7 40 0 is_stmt 0 discriminator 1
+ 2011 0024 FB79     	 ldrb r3,[r7,#7]
+ 2012 0026 012B     	 cmp r3,#1
+ 2013 0028 F0D9     	 bls .L76
+ 2014              	.LBE6:
+  44:../main.c     **** 	}
+  45:../main.c     **** 	if(motors_go == 1)
+ 2015              	 .loc 7 45 0 is_stmt 1
+ 2016 002a 074B     	 ldr r3,.L79+4
+ 2017 002c 1B78     	 ldrb r3,[r3]
+ 2018 002e 012B     	 cmp r3,#1
+ 2019 0030 01D1     	 bne .L77
+  46:../main.c     **** 		return 1;
+ 2020              	 .loc 7 46 0
+ 2021 0032 0123     	 movs r3,#1
+ 2022 0034 00E0     	 b .L78
+ 2023              	.L77:
+  47:../main.c     **** 	else
+  48:../main.c     **** 		return 0;
+ 2024              	 .loc 7 48 0
+ 2025 0036 0023     	 movs r3,#0
+ 2026              	.L78:
+  49:../main.c     **** }
+ 2027              	 .loc 7 49 0
+ 2028 0038 1846     	 mov r0,r3
+ 2029 003a 0C37     	 adds r7,r7,#12
+ 2030              	.LCFI116:
+ 2031              	 .cfi_def_cfa_offset 4
+ 2032 003c BD46     	 mov sp,r7
+ 2033              	.LCFI117:
+ 2034              	 .cfi_def_cfa_register 13
+ 2035              	 
+ 2036 003e 5DF8047B 	 ldr r7,[sp],#4
+ 2037              	.LCFI118:
+ 2038              	 .cfi_restore 7
+ 2039              	 .cfi_def_cfa_offset 0
+ 2040 0042 7047     	 bx lr
+ 2041              	.L80:
+ 2042              	 .align 2
+ 2043              	.L79:
+ 2044 0044 00000000 	 .word stanowisko
+ 2045 0048 00000000 	 .word motors_go
+ 2046              	 .cfi_endproc
+ 2047              	.LFE337:
+ 2049              	 .text
+ 2050              	.Letext0:
+ 2051              	 .file 8 "c:\\davev4-64bit\\dave-4.3.2\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 2052              	 .file 9 "c:\\davev4-64bit\\dave-4.3.2\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 2053              	 .file 10 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/CMSIS/Infineon/XMC4500_series/Include/XMC4500.h"
+ 2054              	 .file 11 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc4_scu.h"
+ 2055              	 .file 12 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc4_gpio.h"
+ 2056              	 .file 13 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc_usic.h"
+ 2057              	 .file 14 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc_uart.h"
+ 2058              	 .file 15 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc_ccu4.h"
+ 2059              	 .file 16 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/GLOBAL_CCU4/global_ccu4.h"
+ 2060              	 .file 17 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/TIMER/timer.h"
+ 2061              	 .file 18 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/DAVE.h"
+ 2062              	 .file 19 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/CMSIS/Include/core_cm4.h"
+ 2063              	 .file 20 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/CMSIS/Infineon/XMC4500_series/Include/system_XMC4500.h"
+ 2064              	 .file 21 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/DIGITAL_IO/digital_io_extern.h"
+ 2065              	 .file 22 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/TIMER/timer_extern.h"
+ 2066              	 .file 23 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/UART/uart_extern.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 main.c
     {standard input}:20     .text.XMC_GPIO_SetOutputHigh:00000000 $t
@@ -5036,51 +5153,56 @@ DEFINED SYMBOLS
     {standard input}:403    .data.is_delay:00000000 is_delay
     {standard input}:409    .bss.init:00000000 init
     {standard input}:410    .bss.init:00000000 $d
-                            *COM*:0000005c stanowisko
-    {standard input}:413    .text.delay:00000000 $t
-    {standard input}:418    .text.delay:00000000 delay
-    {standard input}:476    .text.delay:0000003c $d
-    {standard input}:482    .text.Init:00000000 $t
-    {standard input}:487    .text.Init:00000000 Init
-    {standard input}:618    .text.Init:000000b0 $d
-    {standard input}:625    .text.CCU43_1_IRQHandler:00000000 $t
-    {standard input}:630    .text.CCU43_1_IRQHandler:00000000 CCU43_1_IRQHandler
-    {standard input}:661    .text.CCU43_1_IRQHandler:00000014 $d
-    {standard input}:666    .text.Ik:00000000 $t
-    {standard input}:671    .text.Ik:00000000 Ik
-    {standard input}:842    .text.Ik:000001d0 $d
-    {standard input}:854    .text.Fk:00000000 $t
-    {standard input}:859    .text.Fk:00000000 Fk
-    {standard input}:1058   .text.Fk:000001d4 $d
-    {standard input}:1066   .text.update:00000000 $t
-    {standard input}:1071   .text.update:00000000 update
-    {standard input}:1174   .text.update:000000e0 $d
-    {standard input}:1183   .text.Spring:00000000 $t
-    {standard input}:1188   .text.Spring:00000000 Spring
-    {standard input}:1250   .text.Spring:00000064 $d
-    {standard input}:1256   .text.XMC_Init:00000000 $t
-    {standard input}:1261   .text.XMC_Init:00000000 XMC_Init
-    {standard input}:1791   .text.Send:00000000 Send
-    {standard input}:1334   .text.XMC_Init:0000004c $d
-    {standard input}:1340   .text.XMC_Check:00000000 $t
-    {standard input}:1345   .text.XMC_Check:00000000 XMC_Check
-    {standard input}:1416   .text.XMC_Check:00000050 $d
-    {standard input}:1422   .text.eorx:00000000 $t
-    {standard input}:1427   .text.eorx:00000000 eorx
-    {standard input}:1557   .text.Message_interpreter:00000000 Message_interpreter
-    {standard input}:1511   .text.eorx:00000070 $d
-    {standard input}:1519   .text.eotx:00000000 $t
-    {standard input}:1524   .text.eotx:00000000 eotx
-    {standard input}:1552   .text.Message_interpreter:00000000 $t
-    {standard input}:1683   .text.Message_interpreter:000000ac $d
-    {standard input}:1690   .text.Send_Leg:00000000 $t
-    {standard input}:1695   .text.Send_Leg:00000000 Send_Leg
-    {standard input}:1781   .text.Send_Leg:00000074 $d
-    {standard input}:1786   .text.Send:00000000 $t
-    {standard input}:1842   .text.Send:00000034 $d
-    {standard input}:1849   .text.main:00000000 $t
-    {standard input}:1854   .text.main:00000000 main
-    {standard input}:1935   .text.main:00000078 $d
+    {standard input}:415    .bss.motors_go:00000000 motors_go
+    {standard input}:416    .bss.motors_go:00000000 $d
+                            *COM*:0000004c stanowisko
+    {standard input}:419    .text.delay:00000000 $t
+    {standard input}:424    .text.delay:00000000 delay
+    {standard input}:482    .text.delay:0000003c $d
+    {standard input}:488    .text.Init:00000000 $t
+    {standard input}:493    .text.Init:00000000 Init
+    {standard input}:612    .text.Init:0000009c $d
+    {standard input}:619    .text.CCU43_1_IRQHandler:00000000 $t
+    {standard input}:624    .text.CCU43_1_IRQHandler:00000000 CCU43_1_IRQHandler
+    {standard input}:655    .text.CCU43_1_IRQHandler:00000014 $d
+    {standard input}:660    .text.Ik:00000000 $t
+    {standard input}:665    .text.Ik:00000000 Ik
+    {standard input}:836    .text.Ik:000001d0 $d
+    {standard input}:848    .text.Fk:00000000 $t
+    {standard input}:853    .text.Fk:00000000 Fk
+    {standard input}:1052   .text.Fk:000001d4 $d
+    {standard input}:1060   .text.Update:00000000 $t
+    {standard input}:1065   .text.Update:00000000 Update
+    {standard input}:1169   .text.Update:000000e0 $d
+    {standard input}:1178   .text.Spring:00000000 $t
+    {standard input}:1183   .text.Spring:00000000 Spring
+    {standard input}:1245   .text.Spring:00000064 $d
+    {standard input}:1251   .text.XMC_Init:00000000 $t
+    {standard input}:1256   .text.XMC_Init:00000000 XMC_Init
+    {standard input}:1810   .text.Send:00000000 Send
+    {standard input}:1354   .text.XMC_Init:00000078 $d
+    {standard input}:1359   .text.XMC_Check:00000000 $t
+    {standard input}:1364   .text.XMC_Check:00000000 XMC_Check
+    {standard input}:1435   .text.XMC_Check:00000050 $d
+    {standard input}:1441   .text.eorx:00000000 $t
+    {standard input}:1446   .text.eorx:00000000 eorx
+    {standard input}:1576   .text.Message_interpreter:00000000 Message_interpreter
+    {standard input}:1530   .text.eorx:00000070 $d
+    {standard input}:1538   .text.eotx:00000000 $t
+    {standard input}:1543   .text.eotx:00000000 eotx
+    {standard input}:1571   .text.Message_interpreter:00000000 $t
+    {standard input}:1702   .text.Message_interpreter:000000ac $d
+    {standard input}:1709   .text.Send_Leg:00000000 $t
+    {standard input}:1714   .text.Send_Leg:00000000 Send_Leg
+    {standard input}:1800   .text.Send_Leg:00000074 $d
+    {standard input}:1805   .text.Send:00000000 $t
+    {standard input}:1861   .text.Send:00000034 $d
+    {standard input}:1868   .text.main:00000000 $t
+    {standard input}:1873   .text.main:00000000 main
+    {standard input}:1955   .text.main:00000078 $d
+    {standard input}:1965   .text.Motors_go_nogo:00000000 $t
+    {standard input}:1970   .text.Motors_go_nogo:00000000 Motors_go_nogo
+    {standard input}:2044   .text.Motors_go_nogo:00000044 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
