@@ -16,7 +16,6 @@ RM := rm -rf
 -include Dave/Generated/INTERRUPT/subdir.mk
 -include Dave/Generated/GLOBAL_CCU4/subdir.mk
 -include Dave/Generated/DIGITAL_IO/subdir.mk
--include Dave/Generated/DAC/subdir.mk
 -include Dave/Generated/CPU_CTRL_XMC4/subdir.mk
 -include Dave/Generated/CLOCK_XMC4/subdir.mk
 -include Dave/Generated/subdir.mk
@@ -52,7 +51,7 @@ LIST_FILES = $(addsuffix .o.lst, $(basename $(OBJS)))
 MAP_FILE = "MAB_Komputer.map"
 
 TOOLCHAIN_ROOT=C:/DAVEv4-64Bit/DAVE-4.3.2/eclipse/ARM-GCC-49
-PROJECT_LOC=C:/Users/Mafish/Documents/XMCDev/MAB_Komputer
+PROJECT_LOC=C:/Users/Mafish/Documents/GitHub/MAB_Controller
 
 # All Target
 all: MAB_Komputer.elf secondary-outputs

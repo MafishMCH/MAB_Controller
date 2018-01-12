@@ -29,7 +29,6 @@ Dave/Generated/INTERRUPT \
 Dave/Generated/GLOBAL_CCU4 \
 Dave/Generated/DIGITAL_IO \
 Dave/Generated \
-Dave/Generated/DAC \
 Dave/Generated/CPU_CTRL_XMC4 \
 Dave/Generated/CLOCK_XMC4 \
 

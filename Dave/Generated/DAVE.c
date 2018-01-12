@@ -85,16 +85,6 @@ DAVE_STATUS_t DAVE_Init(void)
   {
 	 /**  Initialization of INTERRUPT APP instance TIM_IRQ */
 	 init_status = (DAVE_STATUS_t)INTERRUPT_Init(&TIM_IRQ); 
-   } 
-  if (init_status == DAVE_STATUS_SUCCESS)
-  {
-	 /**  Initialization of DAC APP instance IQ_zmierzone */
-	 init_status = (DAVE_STATUS_t)DAC_Init(&IQ_zmierzone); 
-   } 
-  if (init_status == DAVE_STATUS_SUCCESS)
-  {
-	 /**  Initialization of DAC APP instance IQ_zadane */
-	 init_status = (DAVE_STATUS_t)DAC_Init(&IQ_zadane); 
    }  
   return init_status;
 } /**  End of function DAVE_Init */

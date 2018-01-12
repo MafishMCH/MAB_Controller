@@ -22,7 +22,7 @@
   22              	 .thumb
   23              	 .thumb_func
   25              	DAVE_Init:
-  26              	.LFB360:
+  26              	.LFB322:
   27              	 .file 1 "../Dave/Generated/DAVE.c"
    1:../Dave/Generated/DAVE.c **** 
    2:../Dave/Generated/DAVE.c **** /**
@@ -110,7 +110,7 @@
   66:../Dave/Generated/DAVE.c ****      /** @Initialization of APPs Init Functions */
   67:../Dave/Generated/DAVE.c ****      init_status = (DAVE_STATUS_t)CLOCK_XMC4_Init(&CLOCK_XMC4_0);
   46              	 .loc 1 67 0
-  47 000a 1D48     	 ldr r0,.L9
+  47 000a 1548     	 ldr r0,.L7
   48 000c FFF7FEFF 	 bl CLOCK_XMC4_Init
   49 0010 0346     	 mov r3,r0
   50 0012 FB71     	 strb r3,[r7,#7]
@@ -124,7 +124,7 @@
   71:../Dave/Generated/DAVE.c **** 	 /**  Initialization of UART APP instance RS */
   72:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)UART_Init(&RS); 
   55              	 .loc 1 72 0
-  56 001a 1A48     	 ldr r0,.L9+4
+  56 001a 1248     	 ldr r0,.L7+4
   57 001c FFF7FEFF 	 bl UART_Init
   58 0020 0346     	 mov r3,r0
   59 0022 FB71     	 strb r3,[r7,#7]
@@ -139,7 +139,7 @@
   76:../Dave/Generated/DAVE.c **** 	 /**  Initialization of DIGITAL_IO APP instance LED1 */
   77:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)DIGITAL_IO_Init(&LED1); 
   65              	 .loc 1 77 0
-  66 002a 1748     	 ldr r0,.L9+8
+  66 002a 0F48     	 ldr r0,.L7+8
   67 002c FFF7FEFF 	 bl DIGITAL_IO_Init
   68 0030 0346     	 mov r3,r0
   69 0032 FB71     	 strb r3,[r7,#7]
@@ -154,7 +154,7 @@
   81:../Dave/Generated/DAVE.c **** 	 /**  Initialization of TIMER APP instance DELAY */
   82:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)TIMER_Init(&DELAY); 
   75              	 .loc 1 82 0
-  76 003a 1448     	 ldr r0,.L9+12
+  76 003a 0C48     	 ldr r0,.L7+12
   77 003c FFF7FEFF 	 bl TIMER_Init
   78 0040 0346     	 mov r3,r0
   79 0042 FB71     	 strb r3,[r7,#7]
@@ -169,101 +169,66 @@
   86:../Dave/Generated/DAVE.c **** 	 /**  Initialization of INTERRUPT APP instance TIM_IRQ */
   87:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)INTERRUPT_Init(&TIM_IRQ); 
   85              	 .loc 1 87 0
-  86 004a 1148     	 ldr r0,.L9+16
+  86 004a 0948     	 ldr r0,.L7+16
   87 004c FFF7FEFF 	 bl INTERRUPT_Init
   88 0050 0346     	 mov r3,r0
   89 0052 FB71     	 strb r3,[r7,#7]
   90              	.L5:
-  88:../Dave/Generated/DAVE.c ****    } 
-  89:../Dave/Generated/DAVE.c ****   if (init_status == DAVE_STATUS_SUCCESS)
+  88:../Dave/Generated/DAVE.c ****    }  
+  89:../Dave/Generated/DAVE.c ****   return init_status;
   91              	 .loc 1 89 0
   92 0054 FB79     	 ldrb r3,[r7,#7]
-  93 0056 002B     	 cmp r3,#0
-  94 0058 04D1     	 bne .L6
-  90:../Dave/Generated/DAVE.c ****   {
-  91:../Dave/Generated/DAVE.c **** 	 /**  Initialization of DAC APP instance IQ_zmierzone */
-  92:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)DAC_Init(&IQ_zmierzone); 
-  95              	 .loc 1 92 0
-  96 005a 0E48     	 ldr r0,.L9+20
-  97 005c FFF7FEFF 	 bl DAC_Init
-  98 0060 0346     	 mov r3,r0
-  99 0062 FB71     	 strb r3,[r7,#7]
- 100              	.L6:
-  93:../Dave/Generated/DAVE.c ****    } 
-  94:../Dave/Generated/DAVE.c ****   if (init_status == DAVE_STATUS_SUCCESS)
- 101              	 .loc 1 94 0
- 102 0064 FB79     	 ldrb r3,[r7,#7]
- 103 0066 002B     	 cmp r3,#0
- 104 0068 04D1     	 bne .L7
-  95:../Dave/Generated/DAVE.c ****   {
-  96:../Dave/Generated/DAVE.c **** 	 /**  Initialization of DAC APP instance IQ_zadane */
-  97:../Dave/Generated/DAVE.c **** 	 init_status = (DAVE_STATUS_t)DAC_Init(&IQ_zadane); 
- 105              	 .loc 1 97 0
- 106 006a 0B48     	 ldr r0,.L9+24
- 107 006c FFF7FEFF 	 bl DAC_Init
- 108 0070 0346     	 mov r3,r0
- 109 0072 FB71     	 strb r3,[r7,#7]
- 110              	.L7:
-  98:../Dave/Generated/DAVE.c ****    }  
-  99:../Dave/Generated/DAVE.c ****   return init_status;
- 111              	 .loc 1 99 0
- 112 0074 FB79     	 ldrb r3,[r7,#7]
- 100:../Dave/Generated/DAVE.c **** } /**  End of function DAVE_Init */
- 113              	 .loc 1 100 0
- 114 0076 1846     	 mov r0,r3
- 115 0078 0837     	 adds r7,r7,#8
- 116              	.LCFI3:
- 117              	 .cfi_def_cfa_offset 8
- 118 007a BD46     	 mov sp,r7
- 119              	.LCFI4:
- 120              	 .cfi_def_cfa_register 13
- 121              	 
- 122 007c 80BD     	 pop {r7,pc}
- 123              	.L10:
- 124 007e 00BF     	 .align 2
- 125              	.L9:
- 126 0080 00000000 	 .word CLOCK_XMC4_0
- 127 0084 00000000 	 .word RS
- 128 0088 00000000 	 .word LED1
- 129 008c 00000000 	 .word DELAY
- 130 0090 00000000 	 .word TIM_IRQ
- 131 0094 00000000 	 .word IQ_zmierzone
- 132 0098 00000000 	 .word IQ_zadane
- 133              	 .cfi_endproc
- 134              	.LFE360:
- 136              	 .text
- 137              	.Letext0:
- 138              	 .file 2 "c:\\davev4-64bit\\dave-4.3.2\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
- 139              	 .file 3 "c:\\davev4-64bit\\dave-4.3.2\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
- 140              	 .file 4 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/CMSIS/Infineon/XMC4500_series/Include/XMC4500.h"
- 141              	 .file 5 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/XMCLib/inc/xmc4_scu.h"
- 142              	 .file 6 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/XMCLib/inc/xmc_gpio.h"
- 143              	 .file 7 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/XMCLib/inc/xmc4_gpio.h"
- 144              	 .file 8 "../Dave/Generated/CLOCK_XMC4/clock_xmc4.h"
- 145              	 .file 9 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/XMCLib/inc/xmc_usic.h"
- 146              	 .file 10 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/XMCLib/inc/xmc_uart.h"
- 147              	 .file 11 "../Dave/Generated/UART/uart.h"
- 148              	 .file 12 "../Dave/Generated/DIGITAL_IO/digital_io.h"
- 149              	 .file 13 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/XMCLib/inc/xmc_ccu4.h"
- 150              	 .file 14 "../Dave/Generated/GLOBAL_CCU4/global_ccu4.h"
- 151              	 .file 15 "../Dave/Generated/TIMER/timer.h"
- 152              	 .file 16 "../Dave/Generated/INTERRUPT/interrupt.h"
- 153              	 .file 17 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/XMCLib/inc/xmc_dac.h"
- 154              	 .file 18 "../Dave/Generated/DAC/dac.h"
- 155              	 .file 19 "../Dave/Generated/DAVE.h"
- 156              	 .file 20 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/CMSIS/Include/core_cm4.h"
- 157              	 .file 21 "C:/Users/Mafish/Documents/XMCDev/MAB_Komputer/Libraries/CMSIS/Infineon/XMC4500_series/Include/system_XMC4500.h"
- 158              	 .file 22 "../Dave/Generated/CLOCK_XMC4/clock_xmc4_extern.h"
- 159              	 .file 23 "../Dave/Generated/DIGITAL_IO/digital_io_extern.h"
- 160              	 .file 24 "../Dave/Generated/TIMER/timer_extern.h"
- 161              	 .file 25 "../Dave/Generated/INTERRUPT/interrupt_extern.h"
- 162              	 .file 26 "../Dave/Generated/DAC/dac_extern.h"
- 163              	 .file 27 "../Dave/Generated/UART/uart_extern.h"
+  90:../Dave/Generated/DAVE.c **** } /**  End of function DAVE_Init */
+  93              	 .loc 1 90 0
+  94 0056 1846     	 mov r0,r3
+  95 0058 0837     	 adds r7,r7,#8
+  96              	.LCFI3:
+  97              	 .cfi_def_cfa_offset 8
+  98 005a BD46     	 mov sp,r7
+  99              	.LCFI4:
+ 100              	 .cfi_def_cfa_register 13
+ 101              	 
+ 102 005c 80BD     	 pop {r7,pc}
+ 103              	.L8:
+ 104 005e 00BF     	 .align 2
+ 105              	.L7:
+ 106 0060 00000000 	 .word CLOCK_XMC4_0
+ 107 0064 00000000 	 .word RS
+ 108 0068 00000000 	 .word LED1
+ 109 006c 00000000 	 .word DELAY
+ 110 0070 00000000 	 .word TIM_IRQ
+ 111              	 .cfi_endproc
+ 112              	.LFE322:
+ 114              	 .text
+ 115              	.Letext0:
+ 116              	 .file 2 "c:\\davev4-64bit\\dave-4.3.2\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 117              	 .file 3 "c:\\davev4-64bit\\dave-4.3.2\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 118              	 .file 4 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/CMSIS/Infineon/XMC4500_series/Include/XMC4500.h"
+ 119              	 .file 5 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc4_scu.h"
+ 120              	 .file 6 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc_gpio.h"
+ 121              	 .file 7 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc4_gpio.h"
+ 122              	 .file 8 "../Dave/Generated/CLOCK_XMC4/clock_xmc4.h"
+ 123              	 .file 9 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc_usic.h"
+ 124              	 .file 10 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc_uart.h"
+ 125              	 .file 11 "../Dave/Generated/UART/uart.h"
+ 126              	 .file 12 "../Dave/Generated/DIGITAL_IO/digital_io.h"
+ 127              	 .file 13 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/XMCLib/inc/xmc_ccu4.h"
+ 128              	 .file 14 "../Dave/Generated/GLOBAL_CCU4/global_ccu4.h"
+ 129              	 .file 15 "../Dave/Generated/TIMER/timer.h"
+ 130              	 .file 16 "../Dave/Generated/INTERRUPT/interrupt.h"
+ 131              	 .file 17 "../Dave/Generated/DAVE.h"
+ 132              	 .file 18 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/CMSIS/Include/core_cm4.h"
+ 133              	 .file 19 "C:/Users/Mafish/Documents/GitHub/MAB_Controller/Libraries/CMSIS/Infineon/XMC4500_series/Include/system_XMC4500.h"
+ 134              	 .file 20 "../Dave/Generated/CLOCK_XMC4/clock_xmc4_extern.h"
+ 135              	 .file 21 "../Dave/Generated/DIGITAL_IO/digital_io_extern.h"
+ 136              	 .file 22 "../Dave/Generated/TIMER/timer_extern.h"
+ 137              	 .file 23 "../Dave/Generated/INTERRUPT/interrupt_extern.h"
+ 138              	 .file 24 "../Dave/Generated/UART/uart_extern.h"
 DEFINED SYMBOLS
                             *ABS*:00000000 DAVE.c
     {standard input}:20     .text.DAVE_Init:00000000 $t
     {standard input}:25     .text.DAVE_Init:00000000 DAVE_Init
-    {standard input}:126    .text.DAVE_Init:00000080 $d
+    {standard input}:106    .text.DAVE_Init:00000060 $d
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
@@ -272,11 +237,8 @@ UART_Init
 DIGITAL_IO_Init
 TIMER_Init
 INTERRUPT_Init
-DAC_Init
 CLOCK_XMC4_0
 RS
 LED1
 DELAY
 TIM_IRQ
-IQ_zmierzone
-IQ_zadane
