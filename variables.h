@@ -9,7 +9,7 @@ float l1 =100;					//length of thight
 float l2 =200;					//length of tibia
 float d =89;					//distance between motors
 float t = 0.0f;					//time of execution
-float dt = 0.02;				//delta t
+float dt = -0.15;				//delta t
 
 //communication vars
 uint8_t rxData[10];								//buffer for incoming messages
@@ -43,13 +43,16 @@ struct Leg											//structure holding leg parameters
 	int32_t ang_abs[2];						//absolute angle of the motor
 	float ang_abs_poprzedni[2];		//last absolute angle of the motor
 	float predkosc_silnika[2];			//motor speed
-	int16_t ks;										//virtal spring strength
-	int16_t kd;										//virtual damper strength
+	uint16_t ks;										//virtal spring strength
+	uint16_t kd;										//virtual damper strength
 	int32_t teta_int[2];							//commanded motor angle as 32bit integer
-	int16_t poz_zad[2];						//commanded motor angle as 16bit integer
+	uint16_t poz_zad[2];						//commanded motor angle as 16bit unsigned integer
 	struct vec2 foot;							//commanded foot position in milimeters in x-y reference frame
 	float teta[2];									//commanded motor angle in radaians
 	float ang_abs_rad[2];					//current motor angle in radians
+	struct vec2 eF;								//estimated Forces on the foot
+	float torque[2];								//measured Torque on the motors
+	uint8_t  skoki;;
 };
 struct Leg stanowisko;					//struct for test stand , a single leg
 
@@ -78,10 +81,11 @@ void Init()			//initialization function for test stand
 		stanowisko.motor_go[i]  =0;
 		stanowisko.motor_n[i] = 0;
 	}
-	stanowisko.ks = 5050;
-	stanowisko.kd = 8;
+	stanowisko.ks = 550;
+	stanowisko.kd = 600;
 	stanowisko.foot.x = 0;
 	stanowisko.foot.y = 200;
+	stanowisko.skoki = 0;
 }
 void TIMER_IRQ()				//delay interrupt
 {

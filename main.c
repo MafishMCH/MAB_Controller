@@ -4,6 +4,7 @@
 #include "variables.h"
 #include "kinematics.h"
 #include "communications.h"
+#include "dynamics.h"
 
 uint8_t Motors_go_nogo();
 
@@ -13,27 +14,43 @@ int main(void)
   status = DAVE_Init();
   while(status == DAVE_STATUS_FAILURE )
   {
-	  delay(100000);
+	  delay(50000);
 	   DIGITAL_IO_ToggleOutput(&LED1);
   }
-  while(init == 0);							//wait for input from PC
+  delay(250000);
   Init();
-  delay(2500);
+ /*
+  while(init == 0)							//wait for input from PC
+  {
+	  delay(500000);
+	   DIGITAL_IO_ToggleOutput(&LED1);
+  }
+  */
+
   XMC_Init(10);
 
+/*
   while(motors_go == 0)				//Procedure to check if all motors are go
   {
 	  XMC_Check();
 	  if(Motors_go_nogo() == 0)
 		  XMC_Init(10);
   }
-
+*/
   while(1)
   {
+	  Ik(&stanowisko);
 	  Update(&stanowisko);
 	  Send_Leg(&stanowisko);
+
+	 stanowisko.torque[0] = -TorqueFromInet(stanowisko.i_net[0]);
+	 stanowisko.torque[1] = TorqueFromInet(stanowisko.i_net[1]);
+	 Fk(&stanowisko);
+
 	  t+= dt;
-	  delay(2000);
+
+	  DIGITAL_IO_ToggleOutput(&LED1);
+	  delay(30000);
   }
 }
 

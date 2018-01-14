@@ -56,8 +56,8 @@
 
 const DIGITAL_IO_t LED1 =
 {
-  .gpio_port = XMC_GPIO_PORT5,
-  .gpio_pin = 7U,
+  .gpio_port = XMC_GPIO_PORT1,
+  .gpio_pin = 0U,
   .gpio_config = {
     .mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL,
     .output_level = XMC_GPIO_OUTPUT_LEVEL_LOW,

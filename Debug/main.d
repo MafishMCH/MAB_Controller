@@ -43,7 +43,7 @@ main.o main.d main.o: ../main.c \
  C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/INTERRUPT/interrupt.h \
  C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/INTERRUPT/interrupt_conf.h \
  C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/INTERRUPT/interrupt_extern.h \
- ../variables.h ../kinematics.h ../communications.h
+ ../variables.h ../kinematics.h ../communications.h ../dynamics.h
 
 C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/DAVE.h:
 
@@ -138,3 +138,5 @@ C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/INTERRUPT/interru
 ../kinematics.h:
 
 ../communications.h:
+
+../dynamics.h:

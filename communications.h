@@ -21,14 +21,14 @@ uint8_t  XMC_Init(uint8_t n)	//initialize driver (n). n=10 for all drivers
 			txData[2] = 0xA1;
 			txData[3] = EOF;
 			Send(4);
-			delay(300);
+			delay(1100);
 		}
 	else										//init single driver (n)
 		txData[1] = 0x10 + n;
 		txData[2] = 0xA1;
 		txData[3] = EOF;
 		Send(4);
-		delay(300);
+		delay(1100);
 
 	return 0;
 }
@@ -41,7 +41,7 @@ void XMC_Check()	//check state all drivers
 		txData[2] = 0xA3;
 		txData[3] = EOF;
 		Send(4);
-		delay(300);
+		delay(1100);
 		DIGITAL_IO_SetOutputLow((&LED1));
 	}
 }
@@ -96,14 +96,23 @@ void Send_Leg(struct Leg *n)	//Send regular command string to both of legs drive
 	  txData[1] = n->adresy[0];
 	  txData[2] = n->poz_zad[0] >> 8;
 	  txData[3] = n->poz_zad[0];
-	  txData[4] = EOF;
-	  Send(5);
-	  delay(500);
+	  txData[4] = n->ks >> 8;
+	  txData[5] = n->ks;
+	  txData[6] = n->kd >>8;
+	  txData[7] = n->kd;
+	  txData[8] = EOF;
+	  Send(9);
+	  delay(1100);
 	  txData[1] = n->adresy[1];
 	  txData[2] = n->poz_zad[1] >> 8;
 	  txData[3] = n->poz_zad[1];
-	  Send(5);
-	  delay(500);
+	  txData[4] = n->ks >> 8;
+	  txData[5] = n->ks;
+	  txData[6] = n->kd >>8;
+	  txData[7] = n->kd;
+	  txData[8] = EOF;
+	  Send(9);
+	  delay(1100);
 }
 void Send(uint8_t size )	// Send (n) bytes of data via half-duplex uart
 {
