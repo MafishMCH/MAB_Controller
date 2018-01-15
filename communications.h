@@ -77,44 +77,44 @@ void Message_interpreter()		//read last message
 		uint8_t numer_silnika;
 		numer_silnika = rxData[2] - 0x10;
 		if(rxData[3] == INIT)
-			stanowisko.motor_go[numer_silnika] = rxData[4];
+			motors[numer_silnika].is_go = rxData[4];
 		else if(rxData[3] == CHECK)
 		{
-			stanowisko.motor_go[numer_silnika] = rxData[4];
-			stanowisko.motor_n[numer_silnika] = rxData[5];
+			motors[numer_silnika].is_go = rxData[4];
+			motors[numer_silnika].motor_n = rxData[5];
 		}
 		else
 		{
-			stanowisko.i_net[numer_silnika] =rxData[3] << 8 | rxData[4];
-			stanowisko.ang_abs[numer_silnika] = rxData[5] << 24 | rxData[6] << 16 | rxData[7] << 8 | rxData[8];
+			motors[numer_silnika].i_net =rxData[3] << 8 | rxData[4];
+			motors[numer_silnika].ang_abs = rxData[5] << 24 | rxData[6] << 16 | rxData[7] << 8 | rxData[8];
 		}
 	}
 
 }
 void Send_Leg(struct Leg *n)	//Send regular command string to both of legs drivers
 {
-	n->poz_zad[0] = n->teta[0] * INT16_MAX / pi;
-	n->poz_zad[1] = n->teta[1] * INT16_MAX / pi;
-	  txData[1] = n->adresy[0];
-	  txData[2] = n->poz_zad[0] >> 8;
-	  txData[3] = n->poz_zad[0];
-	  txData[4] = n->ks[0] >> 8;
-	  txData[5] = n->ks[0];
-	  txData[6] = n->kd[0] >>8;
-	  txData[7] = n->kd[0];
-	  txData[8] = EOF;
-	  Send(9);
-	  delay(1100);
-	  txData[1] = n->adresy[1];
-	  txData[2] = n->poz_zad[1] >> 8;
-	  txData[3] = n->poz_zad[1];
-	  txData[4] = n->ks[1] >> 8;
-	  txData[5] = n->ks[1];
-	  txData[6] = n->kd[1] >>8;
-	  txData[7] = n->kd[1];
-	  txData[8] = EOF;
-	  Send(9);
-	  delay(1100);
+	motors[n->motor_L].poz_zad = motors[n->motor_L].teta * INT16_MAX / pi;
+	motors[n->motor_L].poz_zad = motors[n->motor_L].teta * INT16_MAX / pi;
+	 txData[1] = motors[n->motor_L].adress;
+	 txData[2] = motors[n->motor_L].poz_zad >> 8;
+	 txData[3] = motors[n->motor_L].poz_zad;
+	 txData[4] = motors[n->motor_L].ks >> 8;
+	 txData[5] = motors[n->motor_L].ks;
+	 txData[6] = motors[n->motor_L].kd >>8;
+	 txData[7] = motors[n->motor_L].kd;
+	 txData[8] = EOF;
+	 Send(9);
+	 delay(1100);
+	 txData[1] = motors[n->motor_R].adress;
+	 txData[2] = motors[n->motor_R].poz_zad >> 8;
+	 txData[3] = motors[n->motor_R].poz_zad;
+	 txData[4] = motors[n->motor_R].ks >> 8;
+	 txData[5] = motors[n->motor_R].ks;
+	 txData[6] = motors[n->motor_R].kd >>8;
+	 txData[7] = motors[n->motor_R].kd;
+	 txData[8] = EOF;
+	 Send(9);
+	 delay(1100);
 }
 void Send(uint8_t size )	// Send (n) bytes of data via half-duplex uart
 {

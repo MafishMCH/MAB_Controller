@@ -4,9 +4,7 @@
 #include "variables.h"
 #include "kinematics.h"
 #include "communications.h"
-#include "dynamics.h"
-
-uint8_t Motors_go_nogo();
+//#include "dynamics.h"
 
 int main(void)
 {
@@ -19,6 +17,7 @@ int main(void)
   }
   delay(250000);
   Init();
+
  /*
   while(init == 0)							//wait for input from PC
   {
@@ -29,40 +28,26 @@ int main(void)
 
   XMC_Init(10);
 
-/*
-  while(motors_go == 0)				//Procedure to check if all motors are go
-  {
-	  XMC_Check();
-	  if(Motors_go_nogo() == 0)
-		  XMC_Init(10);
-  }
-*/
+
   while(1)
   {
 	  DIGITAL_IO_ToggleOutput(&LED1);
-	  Ik(&stanowisko);
-	  Update(&stanowisko);
-	 stanowisko.torque[0] = -TorqueFromInet(stanowisko.i_net[0]);
-	 stanowisko.torque[1] = TorqueFromInet(stanowisko.i_net[1]);
-	 t = Z_score_filter(stanowisko.eFY_buffer) * 25;
-	 //Reibert_Hopper(&stanowisko);
-	 Fk(&stanowisko);
-	//  t+= dt;
-	  Send_Leg(&stanowisko);
-	  DIGITAL_IO_ToggleOutput(&LED1);
-	  delay(30000);
-  }
-}
+	  for(uint8_t i =0; i < 4; i++)
+	  {
+		  Ik(&Legs[i]);
+		  Update(&Legs[i]);
+		  Send_Leg(&Legs[i]);
+		  delay(30000);
+	  }
 
-uint8_t Motors_go_nogo()			//Chceck if all motor are initialized properly and ready to be driven TODO przerobic zeby oblugiwalo wszystkie nogi a nie stanowisko
-{
-	for(uint8_t i =0; i < 2; i++)
-	{
-		if(stanowisko.motor_go[i] == 0)
-			motors_go = 0;
-	}
-	if(motors_go == 1)
-		return 1;
-	else
-		return 0;
+	// stanowisko.torque[0] = TorqueFromInet(stanowisko.i_net[0]);
+	// stanowisko.torque[1] = TorqueFromInet(stanowisko.i_net[1]);
+	// t = Z_score_filter(stanowisko.eFY_buffer) * 25;
+	 //Reibert_Hopper(&stanowisko);
+	 //Fk(&stanowisko);
+	  t+= dt;
+
+	  DIGITAL_IO_ToggleOutput(&LED1);
+
+  }
 }
