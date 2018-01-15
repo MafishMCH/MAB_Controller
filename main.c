@@ -39,16 +39,16 @@ int main(void)
 */
   while(1)
   {
+	  DIGITAL_IO_ToggleOutput(&LED1);
 	  Ik(&stanowisko);
 	  Update(&stanowisko);
-	  Send_Leg(&stanowisko);
-
 	 stanowisko.torque[0] = -TorqueFromInet(stanowisko.i_net[0]);
 	 stanowisko.torque[1] = TorqueFromInet(stanowisko.i_net[1]);
+	 t = Z_score_filter(stanowisko.eFY_buffer) * 25;
+	 //Reibert_Hopper(&stanowisko);
 	 Fk(&stanowisko);
-
-	  t+= dt;
-
+	//  t+= dt;
+	  Send_Leg(&stanowisko);
 	  DIGITAL_IO_ToggleOutput(&LED1);
 	  delay(30000);
   }

@@ -93,29 +93,32 @@ void Message_interpreter()		//read last message
 }
 void Send_Leg(struct Leg *n)	//Send regular command string to both of legs drivers
 {
+	n->poz_zad[0] = n->teta[0] * INT16_MAX / pi;
+	n->poz_zad[1] = n->teta[1] * INT16_MAX / pi;
 	  txData[1] = n->adresy[0];
 	  txData[2] = n->poz_zad[0] >> 8;
 	  txData[3] = n->poz_zad[0];
-	  txData[4] = n->ks >> 8;
-	  txData[5] = n->ks;
-	  txData[6] = n->kd >>8;
-	  txData[7] = n->kd;
+	  txData[4] = n->ks[0] >> 8;
+	  txData[5] = n->ks[0];
+	  txData[6] = n->kd[0] >>8;
+	  txData[7] = n->kd[0];
 	  txData[8] = EOF;
 	  Send(9);
 	  delay(1100);
 	  txData[1] = n->adresy[1];
 	  txData[2] = n->poz_zad[1] >> 8;
 	  txData[3] = n->poz_zad[1];
-	  txData[4] = n->ks >> 8;
-	  txData[5] = n->ks;
-	  txData[6] = n->kd >>8;
-	  txData[7] = n->kd;
+	  txData[4] = n->ks[1] >> 8;
+	  txData[5] = n->ks[1];
+	  txData[6] = n->kd[1] >>8;
+	  txData[7] = n->kd[1];
 	  txData[8] = EOF;
 	  Send(9);
 	  delay(1100);
 }
 void Send(uint8_t size )	// Send (n) bytes of data via half-duplex uart
 {
+
 	UART_Transmit(&RS, txData, size);
 	while(UART_IsTxBusy(&RS));
 	UART_Receive(&RS, &rxByte, 1);

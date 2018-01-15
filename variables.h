@@ -43,15 +43,23 @@ struct Leg											//structure holding leg parameters
 	int32_t ang_abs[2];						//absolute angle of the motor
 	float ang_abs_poprzedni[2];		//last absolute angle of the motor
 	float predkosc_silnika[2];			//motor speed
-	uint16_t ks;										//virtal spring strength
-	uint16_t kd;										//virtual damper strength
+	uint16_t ks[2];										//virtal spring strength
+	uint16_t kd[2];									//virtual damper strength
 	int32_t teta_int[2];							//commanded motor angle as 32bit integer
 	uint16_t poz_zad[2];						//commanded motor angle as 16bit unsigned integer
 	struct vec2 foot;							//commanded foot position in milimeters in x-y reference frame
+	struct vec2 real_foot;					//measured foot position in milimeters in x-y reference frame
+	struct vec2 real_speed;				//measured speed of the foot in x-y referance frame
 	float teta[2];									//commanded motor angle in radaians
 	float ang_abs_rad[2];					//current motor angle in radians
 	struct vec2 eF;								//estimated Forces on the foot
+	float eFY_buffer[5];						// buffer for filtering estimated Y forces
 	float torque[2];								//measured Torque on the motors
+	float r0;											//base virtual spring length for Reiberts Hopper
+	float r0_angle;								//motor  angle in radians to achive r0 position for  Reiberts Hopper
+	float ksr;											//virtual spring stiffness cooefficient for Reiberts Hopper
+	float kdr;										//virtual spring damping cooefficient for Reiberts Hopper
+	float J[2][2];									//Jackobian
 	uint8_t  skoki;;
 };
 struct Leg stanowisko;					//struct for test stand , a single leg
@@ -69,7 +77,7 @@ void delay(uint32_t us)					//active delay
 
 void Init()			//initialization function for test stand
 {
-	txData[0] = SOF;
+
 	stanowisko.adresy[0] = 0x10;
 	stanowisko.adresy[1] = 0x11;
 	for(uint8_t i = 0 ; i < 2; i++)
@@ -81,11 +89,23 @@ void Init()			//initialization function for test stand
 		stanowisko.motor_go[i]  =0;
 		stanowisko.motor_n[i] = 0;
 	}
-	stanowisko.ks = 550;
-	stanowisko.kd = 600;
+
+	stanowisko.r0 = 130;
 	stanowisko.foot.x = 0;
+	stanowisko.foot.y = stanowisko.r0;
+	//Ik(&stanowisko);
+	stanowisko.r0_angle = stanowisko.teta[0];
+
+	stanowisko.ks[0] = 180;
+	stanowisko.kd[0] = 800;
+	stanowisko.ks[1] = 180;
+	stanowisko.kd[1] = 800;
+
 	stanowisko.foot.y = 200;
 	stanowisko.skoki = 0;
+	stanowisko.ksr = 2;
+	stanowisko.kdr = 5;
+	txData[0] = SOF;
 }
 void TIMER_IRQ()				//delay interrupt
 {
