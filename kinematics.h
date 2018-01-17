@@ -5,6 +5,13 @@
  *      Author: Mafish
  */
 
+#define ZERO 1e-2
+#define SMALL 1
+#define isZero(A) ( (A < ZERO) && (A > -ZERO) )
+#define isSmall(A) ( (A < SMALL) && (A > -SMALL) )
+#define isSame(A, B) ( ((A-B) < ZERO) && ((A-B) > -ZERO) )
+#define isSimilar(A, B) ( ((A-B) < SMALL) && ((A-B) > -SMALL) )
+
 void Ik(struct Leg *n);		//Inverse kinematics
 void Fk(struct Leg *n);	//Forward kinematics
 void Update(struct Leg *n);	//Update floating numbers from raw data from motor drivers
@@ -23,8 +30,8 @@ void Ik(struct Leg *n)		//Inverse kinematics for (Leg)
 	float psi1 = asinf(((d/2)-x)/La);
 	float psi2 = asinf(((d/2)+x)/Lb);
 
-	motors[n->motor_L]. teta = fi1 - psi1;
-	motors[n->motor_R]. teta = fi2 - psi2;
+	motors[n->motor_L].teta = fi1 - psi1;
+	motors[n->motor_R].teta = fi2 - psi2;
 }
 void Fk(struct Leg *n)		//Forward kinematics for (Leg)
 {
@@ -84,11 +91,154 @@ void Trajectory(struct Leg *n)		//calculate trajectory for selected leg
 	//circle
 	n->foot.x = sinf(t) * 80.0f;
 	n->foot.y =180.0f + cosf(t) * 80.0f;
-	/*if(n->skoki == 1)
-		n->foot.y = 280;
-	else
+}
+uint8_t Smooth(struct Leg *n, struct vec2 target)		//Smooth motion of the foot to desired position; 1 if finished in closed loop,0 if in open loop
+{
+	float steps = 0;
+	struct vec2 direction;
+	Fk(n);
+	direction.x = n->real_foot.x - target.x;
+	direction.y = n->real_foot.y - target.y;
+	float distance = sqrtf(direction.x*direction.x + direction.y * direction.y);
+	steps = distance;
+	for(uint8_t i = 0; i < steps + 5; i++)
 	{
-		if(n->foot.y > 100)
-			n->foot.y -= 2;
-	}*/
+		n->foot.x = n->real_foot.x - (direction.x * distance / (1.05f*steps));
+		n->foot.y = n->real_foot.y - (direction.y * distance / (1.05f*steps));
+		Ik(n);
+		Send_Leg(n);
+		delay(10000);
+		if(isSimilar(n->real_foot.x, target.x) && isSimilar(n->real_foot.y, target.y))
+			return 1;
+		Fk(n);
+		direction.x = n->real_foot.x - target.x;
+		direction.y = n->real_foot.y - target.y;
+		distance = sqrtf(direction.x*direction.x + direction.y * direction.y);
+	}
+	return 0;
+}
+void CPG()
+{
+	float dx = (dt*lkroku)/3; //jednostkowe przemieszczenie po x
+	float predkosc = dx/czas_petli; //[mm/s], tylko do podgl¹du wartosci
+	//inicjalizacja poczatkowych pozycji nog
+	//noga 1
+	Legs[0].foot.x = lkroku/6;
+	Legs[0].foot.y = h_korpus;
+	//noga 2
+	Legs[1].foot.x = -lkroku/2;
+	Legs[1].foot.y = h_korpus;
+	//noga 3
+	Legs[2].foot.x = lkroku/6;
+	Legs[2].foot.y = h_korpus;
+	//noga 4
+	Legs[3].foot.x= -lkroku/2;
+	Legs[3].foot.y = h_korpus;
+	uint32_t czas = 5000;
+	float ugiecie = hkroku / 4;
+	while(1)
+	{
+	if (faza == 1)
+		  				{
+		  					Legs[0].foot.x -= dx;
+		  					Legs[0].foot.y = h_korpus;
+		  					Legs[1].foot.x = lkroku * sinf(t - (pi/2));
+		  					Legs[1].foot.y = h_korpus + hkroku * cosf(t - (pi/2));
+		  					Legs[2].foot.x += dx;
+		  					Legs[2].foot.y = h_korpus - ugiecie;
+		  					Legs[3].foot.x += dx;
+		  					Legs[3].foot.y = h_korpus;
+
+		  					for(uint8_t i = 0; i < 4;i++)
+		  						Ik(&Legs[i]);
+		  					for(uint8_t i = 0; i < 4;i++)
+		  						Send_Leg(&Legs[i]);
+		  					t += dt; //iteracja zmiennej w sin/cos
+
+		  					delay(czas);
+		  					if(t>=pi)
+		  					{
+		  						faza += 1; //iteracja fazy
+		  						t = 0; //zerowanie iteratora
+		  					}
+		  			}
+		  		if (faza == 2)
+		  		  		{
+
+		  		  			Legs[0].foot.x -= dx;
+		  		  			Legs[0].foot.y = h_korpus;
+		  		  			Legs[1].foot.x -= dx;
+		  		  			Legs[1].foot.y = h_korpus - ugiecie;
+		  		  			Legs[2].foot.x = -lkroku * sinf(t - (pi/2));
+		  		  			Legs[2].foot.y = h_korpus + hkroku * cosf(t - (pi/2));
+		  		  			Legs[3].foot.x += dx;
+		  		  			Legs[3].foot.y = h_korpus;
+
+		  					for(uint8_t i = 0; i < 4;i++)
+		  						Ik(&Legs[i]);
+		  					for(uint8_t i = 0; i < 4;i++)
+		  						Send_Leg(&Legs[i]);
+		  					t += dt; //iteracja zmiennej w sin/cos
+
+		  					delay(czas);
+		  		  			if(t>=pi)
+		  		  			{
+		  		  				faza += 1; //iteracja fazy
+		  		  			  	t = 0; //zerowanie iteratora
+		  		  			}
+
+		  		  		}
+		  		if (faza == 3)
+		  			  	{
+
+		  			  		 Legs[0].foot.x = +lkroku * sinf(t - (pi/2));;
+		  			  		 Legs[0].foot.y =  h_korpus + hkroku * cosf(t - (pi/2));
+		  			  		 Legs[1].foot.x -= dx;
+		  			  		 Legs[1].foot.y = h_korpus;
+		  			  		 Legs[2].foot.x += dx;
+		  			  		 Legs[2].foot.y = h_korpus;
+		  			  		 Legs[3].foot.x += dx;
+		  			  		 Legs[3].foot.y = h_korpus - ugiecie;
+
+			  					for(uint8_t i = 0; i < 4;i++)
+			  						Ik(&Legs[i]);
+			  					for(uint8_t i = 0; i < 4;i++)
+			  						Send_Leg(&Legs[i]);
+			  					t += dt; //iteracja zmiennej w sin/cos
+
+			  					delay(czas);
+		  			  		 if(t>=pi)
+		  			  		 {
+		  			  			 faza += 1; //iteracja fazy
+		  			  			 t = 0; //zerowanie iteratora
+		  			  		 }
+
+		  			  	}
+		  		if (faza == 4)
+		  			  	 {
+
+		  					 Legs[0].foot.x -= dx;
+		  			  		 Legs[0].foot.y = h_korpus - ugiecie;
+		  			  		 Legs[1].foot.x -= dx;
+		  			  		 Legs[1].foot.y = h_korpus;
+		  			  		 Legs[2].foot.x += dx;
+		  			  		 Legs[2].foot.y = h_korpus;
+		  			  		 Legs[3].foot.x = -lkroku * sinf(t - (pi/2));
+		  			  		 Legs[3].foot.y = h_korpus + hkroku * cosf(t - (pi/2));
+
+			  					for(uint8_t i = 0; i < 4;i++)
+			  						Ik(&Legs[i]);
+			  					for(uint8_t i = 0; i < 4;i++)
+			  						Send_Leg(&Legs[i]);
+			  					t += dt; //iteracja zmiennej w sin/cos
+
+			  					delay(czas);
+		  			  		 if(t>=pi)
+		  			  		 {
+		  			  			 faza = 1; //iteracja fazy
+		  			  			 t = 0; //zerowanie iteratora
+		  			  		 }
+
+		  			  	 }
+	}
 }

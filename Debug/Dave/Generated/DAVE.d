@@ -40,7 +40,11 @@ Dave/Generated/DAVE.o Dave/Generated/DAVE.d Dave/Generated/DAVE.o: \
  ../Dave/Generated/TIMER/timer_extern.h \
  ../Dave/Generated/INTERRUPT/interrupt.h \
  ../Dave/Generated/INTERRUPT/interrupt_conf.h \
- ../Dave/Generated/INTERRUPT/interrupt_extern.h
+ ../Dave/Generated/INTERRUPT/interrupt_extern.h \
+ ../Dave/Generated/PWM_CCU4/pwm_ccu4.h \
+ ../Dave/Generated/PWM_CCU4/pwm_ccu4_conf.h \
+ ../Dave/Generated/PWM_CCU4/../GLOBAL_CCU4/global_ccu4.h \
+ ../Dave/Generated/PWM_CCU4/pwm_ccu4_extern.h
 
 ../Dave/Generated/DAVE.h:
 
@@ -129,3 +133,11 @@ C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/GLOBAL_CCU4/globa
 ../Dave/Generated/INTERRUPT/interrupt_conf.h:
 
 ../Dave/Generated/INTERRUPT/interrupt_extern.h:
+
+../Dave/Generated/PWM_CCU4/pwm_ccu4.h:
+
+../Dave/Generated/PWM_CCU4/pwm_ccu4_conf.h:
+
+../Dave/Generated/PWM_CCU4/../GLOBAL_CCU4/global_ccu4.h:
+
+../Dave/Generated/PWM_CCU4/pwm_ccu4_extern.h:

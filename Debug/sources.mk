@@ -25,6 +25,7 @@ Libraries/XMCLib/src \
 Libraries/Newlib \
 Dave/Generated/UART \
 Dave/Generated/TIMER \
+Dave/Generated/PWM_CCU4 \
 Dave/Generated/INTERRUPT \
 Dave/Generated/GLOBAL_CCU4 \
 Dave/Generated/DIGITAL_IO \

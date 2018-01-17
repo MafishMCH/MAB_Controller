@@ -20,7 +20,7 @@
   20              	 .section .rodata.TIM_IRQ,"a",%progbits
   21              	 .align 2
   24              	TIM_IRQ:
-  25 0000 39       	 .byte 57
+  25 0000 2E       	 .byte 46
   26 0001 03       	 .byte 3
   27 0002 00       	 .byte 0
   28 0003 01       	 .byte 1

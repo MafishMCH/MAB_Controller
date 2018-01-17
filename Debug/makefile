@@ -13,6 +13,7 @@ RM := rm -rf
 -include Libraries/Newlib/subdir.mk
 -include Dave/Generated/UART/subdir.mk
 -include Dave/Generated/TIMER/subdir.mk
+-include Dave/Generated/PWM_CCU4/subdir.mk
 -include Dave/Generated/INTERRUPT/subdir.mk
 -include Dave/Generated/GLOBAL_CCU4/subdir.mk
 -include Dave/Generated/DIGITAL_IO/subdir.mk

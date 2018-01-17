@@ -85,6 +85,11 @@ DAVE_STATUS_t DAVE_Init(void)
   {
 	 /**  Initialization of INTERRUPT APP instance TIM_IRQ */
 	 init_status = (DAVE_STATUS_t)INTERRUPT_Init(&TIM_IRQ); 
+   } 
+  if (init_status == DAVE_STATUS_SUCCESS)
+  {
+	 /**  Initialization of PWM_CCU4 APP instance PWM_CCU4_0 */
+	 init_status = (DAVE_STATUS_t)PWM_CCU4_Init(&PWM_CCU4_0); 
    }  
   return init_status;
 } /**  End of function DAVE_Init */

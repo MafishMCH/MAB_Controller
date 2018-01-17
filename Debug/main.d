@@ -43,7 +43,11 @@ main.o main.d main.o: ../main.c \
  C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/INTERRUPT/interrupt.h \
  C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/INTERRUPT/interrupt_conf.h \
  C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/INTERRUPT/interrupt_extern.h \
- ../variables.h ../kinematics.h ../communications.h
+ C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/PWM_CCU4/pwm_ccu4.h \
+ C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/PWM_CCU4/pwm_ccu4_conf.h \
+ c:\users\mafish\documents\github\mab_controller\dave\generated\global_ccu4\global_ccu4.h \
+ C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/PWM_CCU4/pwm_ccu4_extern.h \
+ ../variables.h ../communications.h ../kinematics.h
 
 C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/DAVE.h:
 
@@ -133,8 +137,16 @@ C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/INTERRUPT/interru
 
 C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/INTERRUPT/interrupt_extern.h:
 
+C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/PWM_CCU4/pwm_ccu4.h:
+
+C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/PWM_CCU4/pwm_ccu4_conf.h:
+
+c:\users\mafish\documents\github\mab_controller\dave\generated\global_ccu4\global_ccu4.h:
+
+C:/Users/Mafish/Documents/GitHub/MAB_Controller/Dave/Generated/PWM_CCU4/pwm_ccu4_extern.h:
+
 ../variables.h:
 
-../kinematics.h:
-
 ../communications.h:
+
+../kinematics.h:

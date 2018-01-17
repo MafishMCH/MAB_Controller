@@ -11,6 +11,7 @@ void eorx();									//end of receive interrupt
 void Message_interpreter();		//read last message
 void Send(uint8_t);						// Send (n) bytes of data via half-duplex uart
 void Send_Leg(struct Leg *n);	//Send regular command string to both of legs drivers
+uint8_t motors_go();			//go no go sequence for all motor drivers
 
 uint8_t  XMC_Init(uint8_t n)	//initialize driver (n). n=10 for all drivers
 {
@@ -21,14 +22,14 @@ uint8_t  XMC_Init(uint8_t n)	//initialize driver (n). n=10 for all drivers
 			txData[2] = 0xA1;
 			txData[3] = EOF;
 			Send(4);
-			delay(1100);
+			delay(response_delay);
 		}
 	else										//init single driver (n)
 		txData[1] = 0x10 + n;
 		txData[2] = 0xA1;
 		txData[3] = EOF;
 		Send(4);
-		delay(1100);
+		delay(response_delay);
 
 	return 0;
 }
@@ -41,7 +42,7 @@ void XMC_Check()	//check state all drivers
 		txData[2] = 0xA3;
 		txData[3] = EOF;
 		Send(4);
-		delay(1100);
+		delay(response_delay);
 		DIGITAL_IO_SetOutputLow((&LED1));
 	}
 }
@@ -94,7 +95,7 @@ void Message_interpreter()		//read last message
 void Send_Leg(struct Leg *n)	//Send regular command string to both of legs drivers
 {
 	motors[n->motor_L].poz_zad = motors[n->motor_L].teta * INT16_MAX / pi;
-	motors[n->motor_L].poz_zad = motors[n->motor_L].teta * INT16_MAX / pi;
+	motors[n->motor_R].poz_zad = motors[n->motor_R].teta * INT16_MAX / pi;
 	 txData[1] = motors[n->motor_L].adress;
 	 txData[2] = motors[n->motor_L].poz_zad >> 8;
 	 txData[3] = motors[n->motor_L].poz_zad;
@@ -104,7 +105,7 @@ void Send_Leg(struct Leg *n)	//Send regular command string to both of legs drive
 	 txData[7] = motors[n->motor_L].kd;
 	 txData[8] = EOF;
 	 Send(9);
-	 delay(1100);
+	 delay(response_delay);
 	 txData[1] = motors[n->motor_R].adress;
 	 txData[2] = motors[n->motor_R].poz_zad >> 8;
 	 txData[3] = motors[n->motor_R].poz_zad;
@@ -114,7 +115,7 @@ void Send_Leg(struct Leg *n)	//Send regular command string to both of legs drive
 	 txData[7] = motors[n->motor_R].kd;
 	 txData[8] = EOF;
 	 Send(9);
-	 delay(1100);
+	 delay(response_delay);
 }
 void Send(uint8_t size )	// Send (n) bytes of data via half-duplex uart
 {
@@ -122,4 +123,22 @@ void Send(uint8_t size )	// Send (n) bytes of data via half-duplex uart
 	UART_Transmit(&RS, txData, size);
 	while(UART_IsTxBusy(&RS));
 	UART_Receive(&RS, &rxByte, 1);
+}
+uint8_t motors_go()			//go no go sequence for all motor drivers; 1 if all are go
+{
+	uint8_t all_go = 0;
+	while(all_go == 0)
+	{
+		XMC_Check();
+		for(uint8_t i = 0; i < 8; i++)
+			if(motors[i].is_go != 1)
+			{
+				all_go = 0;
+				XMC_Init(i);
+				break;
+			}
+			else
+				all_go = 1;
+	}
+	return 1;
 }

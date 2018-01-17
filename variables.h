@@ -1,7 +1,7 @@
 #define SOF 0xCC			//start of message
 #define EOF 0xDD			//end of message
 #define INIT 0xA1			//init message
-#define CHECK 0xA3		//go no go message
+#define CHECK 0xA3			//go no go message
 
 // kinematics vars
 float pi = 3.14159f;
@@ -9,18 +9,25 @@ float l1 =100;					//length of thight
 float l2 =200;					//length of tibia
 float d =89;					//distance between motors
 float t = 0.0f;					//time of execution
-float dt = -0.15;				//delta t
+float dt = 0.25;				//delta t
+float lkroku = 25;
+float hkroku = -60;
+float h_korpus = 160;
+uint8_t faza = 1;
+float czas_petli = 0.33f;
+float predkosc = 0;
+float dx = 0;
 
 //communication vars
-uint8_t rxData[10];								//buffer for incoming messages
-uint8_t txData[10];								//buffer for outgoing messages
-uint8_t adress =0xEE;						//adress of Controller device
-uint8_t rxByte = 0;								//temprorary incoming byte holder
-uint8_t iterator_wiadomosci = 0;	//message iterator
-
+uint8_t rxData[10];						//buffer for incoming messages
+uint8_t txData[10];						//buffer for outgoing messages
+uint8_t adress =0xEE;					//adress of Controller device
+uint8_t rxByte = 0;						//temprorary incoming byte holder
+uint8_t iterator_wiadomosci = 0;		//message iterator
+uint16_t response_delay = 1200;			//how long to wait for a response from driver
 //other vars
-uint8_t is_delay = 1;							//is on active delay
-uint8_t init = 0;									//is initiated
+uint8_t is_delay = 1;					//is on active delay
+uint8_t init = 0;						//is initiated
 
 struct Motor
 {
@@ -90,10 +97,13 @@ void Init()			//initialization function for test stand
 			motors[i].predkosc_silnika = 0;
 			motors[i].is_go  =0;
 			motors[i].motor_n = 0;
-			motors[i].ks = 180;
-			motors[i].kd = 800;
+			motors[i].ks = 3100;
+			motors[i].kd = 10500;
 	}
 	struct vec2 zero;	zero.x = 0;	zero.y = 0;
+
+	for(uint8_t i = 0; i < 8; i++)
+		motors[i].adress = 0x10 + i;
 
 	uint8_t iterator = 0;
 	for(uint8_t i = 0; i < 4; i++ )
@@ -109,10 +119,10 @@ void Init()			//initialization function for test stand
 		Legs[i].r0_angle = 0;
 		Legs[i].real_foot = zero;
 		Legs[i].foot.y = 150;
-		Legs[i].foot.x = 40;
+		Legs[i].foot.x = 0;
 		Legs[i].real_speed = zero;
 	}
-	txData[0] = SOF;
+	txData[0] = 0xCC;
 }
 void TIMER_IRQ()				//delay interrupt
 {

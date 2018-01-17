@@ -69,7 +69,7 @@ const INTERRUPT_t TIM_IRQ =
 #if(UC_SERIES == XMC14)
  .irqctrl = (XMC_SCU_IRQCTRL_t)0U,
 #endif
-  .node = (IRQn_Type)57,
+  .node = (IRQn_Type)46,
   .priority = 3,  
 #if(UC_FAMILY == XMC4)  
   .subpriority = 0,
